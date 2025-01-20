@@ -1,15 +1,16 @@
+// @ts-ignore
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Search, Download, Plus, Lock } from 'lucide-react';
+import { Search, Download, Plus } from 'lucide-react';
+import Navbar from '@/components/Navbar.tsx'
 
-const ValheimManager = () => {
+const Dashboard = () => {
+    // @ts-ignore
     const [activeTab, setActiveTab] = useState('mods');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loginForm, setLoginForm] = useState({ email: '', password: '' });
     const [worldForm, setWorldForm] = useState({
         name: '',
         seed: '',
@@ -27,52 +28,15 @@ const ValheimManager = () => {
 
     const [mods, setMods] = useState(sampleMods);
 
-    const handleModToggle = (modId) => {
+    const handleModToggle = (modId: number) => {
         setMods(mods.map(mod =>
             mod.id === modId ? { ...mod, installed: !mod.installed } : mod
         ));
     };
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        setIsLoggedIn(true);
-    };
-
-    if (!isLoggedIn) {
-        return (
-            <div className="flex justify-center items-center min-h-screen bg-gray-100">
-                <Card className="w-96">
-                    <CardHeader>
-                        <CardTitle>Login to Valheim Manager</CardTitle>
-                        <CardDescription>Manage your mods and worlds</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleLogin} className="space-y-4">
-                            <div className="space-y-2">
-                                <Input
-                                    type="email"
-                                    placeholder="Email"
-                                    value={loginForm.email}
-                                    onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                                />
-                                <Input
-                                    type="password"
-                                    placeholder="Password"
-                                    value={loginForm.password}
-                                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                                />
-                            </div>
-                            <Button type="submit" className="w-full">Login</Button>
-                            <Button variant="outline" className="w-full">Create Account</Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    }
-
     return (
         <div className="p-6 max-w-4xl mx-auto">
+            <Navbar onLogout={() => {}} />
             <Tabs defaultValue="mods" className="space-y-6">
                 <TabsList className="grid grid-cols-2 w-full">
                     <TabsTrigger value="mods">Mod Manager</TabsTrigger>
@@ -157,4 +121,4 @@ const ValheimManager = () => {
     );
 };
 
-export default ValheimManager;
+export default Dashboard;
