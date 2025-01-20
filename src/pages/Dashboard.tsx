@@ -7,8 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Search, Download, Plus } from 'lucide-react';
 import Navbar from '@/components/Navbar.tsx'
+// @ts-ignore
+import {useAuth} from '@/context/AuthContext.jsx'
 
 const Dashboard = () => {
+    const {user} = useAuth()
+
     // @ts-ignore
     const [activeTab, setActiveTab] = useState('mods');
     const [worldForm, setWorldForm] = useState({
@@ -36,7 +40,7 @@ const Dashboard = () => {
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
-            <Navbar onLogout={() => {}} />
+            <Navbar onLogout={() => {}} userId={user.id} avatarId={user.avatar} />
             <Tabs defaultValue="mods" className="space-y-6">
                 <TabsList className="grid grid-cols-2 w-full">
                     <TabsTrigger value="mods">Mod Manager</TabsTrigger>

@@ -1,28 +1,36 @@
 import { createContext, useContext, useState } from 'react';
-
 const AuthContext = createContext(null);
 
+// AuthProvider is used in main.tsx and provides the login, logout, and user props to any component
+// in the Tree. AuthProvider wraps all components (currently) so that any component can get information about
+// the currently authenticated user.
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
-    const login = async (credentials) => {
+    const login = async () => {
+        if(localStorage.getItem("accessToken") == null) {
+            console.error("User must login with discord first as the access token is null.")
+            return false;
+        }
+
         try {
-            // Simulate API call - replace with your actual login API
-            const response = await fetch('/api/login', {
-                method: 'POST',
+            const response = await fetch(`https://discord.com/api/users/@me`, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
+                    'Authorization': `Bearer ${localStorage.getItem("accessToken")}`
+                }
             });
 
-            if (!response.ok) {
-                throw new Error('Login failed');
+            const data = await response.json();
+            if (response.status !== 200) {
+                console.error(`Unexpected response code while getting user from Discord: ${response.status}`)
+                console.error(data)
+                return
             }
 
-            const data = await response.json();
-            setUser(data.user);
-            localStorage.setItem('token', data.token);
+            console.log('setting user data: ', data)
+            setUser(data);
             return true;
         } catch (error) {
             console.error('Login error:', error);
@@ -32,7 +40,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
     };
 
     return (
