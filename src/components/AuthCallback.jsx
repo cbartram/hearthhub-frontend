@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Logo from "@/assets/hearthhub_logo.png";
 import {BASE_URL} from "@/constants.ts";
 // @ts-ignore
-import {useAuth} from "@/context/AuthContext"
+import {useAuth} from "@/context/AuthContext.jsx"
 
 const AuthCallback = () => {
     const navigate = useNavigate();
@@ -26,15 +26,12 @@ const AuthCallback = () => {
                         body: JSON.stringify({ code }),
                     });
 
-                    if(response.status == 200) {
+                    if(response.status === 200) {
                         const data = await response.json()
-                        console.log(data)
-                        localStorage.setItem('accessToken', data.access_token);
-                        localStorage.setItem('refreshToken', data.refresh_token);
-
                         // We have retrieved the tokens from Discord meaning the user has been authenticated
-                        // but we still need to get user details from Discord via login()
-                        if(await login()) {
+                        // but we still need to get user details from Discord via login(). Login() will also
+                        // create the user in Cognito if they do not already exist.
+                        if(await login(data.access_token)) {
                             navigate('/dashboard');
                         }
                     } else {

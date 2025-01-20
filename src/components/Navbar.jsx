@@ -1,10 +1,8 @@
-// @ts-ignore
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import {  Home, Package, LogOut } from 'lucide-react';
+import { Home, Package, LogOut } from 'lucide-react';
 
 
-// @ts-ignore
 const Navbar = ({ onLogout, userId, avatarId }) => (
     <div className="bg-slate-800 text-white p-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
