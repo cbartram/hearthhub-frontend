@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
+    "proxy": "echo 'M7F03s9MfbNvfgDG5B5XIxNgk8dc'"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
