@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ChevronDown } from "lucide-react"
 import {
     Card,
     CardContent,
@@ -18,26 +20,32 @@ import {
     SelectValue
 } from "@/components/ui/select";
 
-const CreateServer = () => {
+const CreateServer = ({ onServerCreate }) => {
     const [formData, setFormData] = useState({
         name: '',
-        worldName: '',
+        world: '',
         password: '',
         isCrossplay: false,
         isPublic: false,
-        difficulty: 'normal',
-        resourceMultiplier: 1,
-        enemyDifficulty: 'normal'
+
+        // Modifiers
+        difficulty: '',
+        deathPenalty: '',
+        resources: '',
+        raids: '',
+        portals: '',
+
+        // Advanced
+        saveIntervalSeconds: 1800,
+        backupCount: 3,
+        initialBackupSeconds: 7200,
+        backupIntervalSeconds: 43200,
     });
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const newServer = {
-            id: Date.now().toString(),
-            ...formData,
-            isRunning: false
-        };
-        setServers([...servers, newServer]);
+        onServerCreate({ ...formData })
     };
 
     return (
@@ -55,15 +63,15 @@ const CreateServer = () => {
                                 <Input
                                     value={formData.name}
                                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                    placeholder="My Epic Viking Server"
+                                    placeholder="My Viking Server"
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
                                 <Label>World Name</Label>
                                 <Input
-                                    value={formData.worldName}
-                                    onChange={(e) => setFormData({...formData, worldName: e.target.value})}
+                                    value={formData.world}
+                                    onChange={(e) => setFormData({...formData, world: e.target.value})}
                                     placeholder="Midgard Realm"
                                     required
                                 />
@@ -98,22 +106,141 @@ const CreateServer = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label>Difficulty</Label>
-                            <Select
-                                value={formData.difficulty}
-                                onValueChange={(value) => setFormData({...formData, difficulty: value})}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Difficulty" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="peaceful">Peaceful</SelectItem>
-                                    <SelectItem value="normal">Normal</SelectItem>
-                                    <SelectItem value="hard">Hard</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <Collapsible className="w-full">
+                            <CollapsibleTrigger className="flex w-full items-center justify-between py-2 bg-gray-200">
+                                <span className="text-primary font-semibold">Optional Modifiers</span>
+                                <ChevronDown className="h-4 w-4" />
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                                <hr className="my-2" />
+                                <div className="space-y-2">
+                                    <Label>Combat Difficulty</Label>
+                                    <Select
+                                        value={formData.difficulty}
+                                        onValueChange={(value) => setFormData({...formData, difficulty: value})}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Difficulty" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="veryeasy">Very Easy</SelectItem>
+                                            <SelectItem value="easy">Easy</SelectItem>
+                                            <SelectItem value="hard">Hard</SelectItem>
+                                            <SelectItem value="veryhard">Very Hard</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Label>Death Penalty</Label>
+                                    <Select
+                                        value={formData.deathPenalty}
+                                        onValueChange={(value) => setFormData({...formData, deathPenalty: value})}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Death Penalty" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="casual">Casual</SelectItem>
+                                            <SelectItem value="veryeasy">Very Easy</SelectItem>
+                                            <SelectItem value="easy">Easy</SelectItem>
+                                            <SelectItem value="hard">Hard</SelectItem>
+                                            <SelectItem value="hardcore">Hardcore</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Label>Resources</Label>
+                                    <Select
+                                        value={formData.resources}
+                                        onValueChange={(value) => setFormData({...formData, resources: value})}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Resources" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="muchless">Much Less</SelectItem>
+                                            <SelectItem value="less">Less</SelectItem>
+                                            <SelectItem value="more">More</SelectItem>
+                                            <SelectItem value="muchmore">Much More</SelectItem>
+                                            <SelectItem value="most">Most</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Label>Raids</Label>
+                                    <Select
+                                        value={formData.raids}
+                                        onValueChange={(value) => setFormData({...formData, raids: value})}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Raid Frequency" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">None</SelectItem>
+                                            <SelectItem value="muchless">Much Less</SelectItem>
+                                            <SelectItem value="less">Less</SelectItem>
+                                            <SelectItem value="more">More</SelectItem>
+                                            <SelectItem value="muchmore">Much More</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Label>Portals</Label>
+                                    <Select
+                                        value={formData.portals}
+                                        onValueChange={(value) => setFormData({...formData, portals: value})}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Portal Functionality" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="casual">Casual</SelectItem>
+                                            <SelectItem value="hard">Hard</SelectItem>
+                                            <SelectItem value="veryhard">Very Hard</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </CollapsibleContent>
+                        </Collapsible>
+
+                        <Collapsible className="w-full">
+                            <CollapsibleTrigger className="flex w-full items-center justify-between py-2 bg-gray-200">
+                                <span className="text-primary font-semibold">Advanced</span>
+                                <ChevronDown className="h-4 w-4" />
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                                <hr className="my-2" />
+                                <div className="space-y-2">
+                                    <Label>Save Interval (seconds)</Label>
+                                    <Input
+                                        value={formData.saveIntervalSeconds}
+                                        type="number"
+                                        onChange={(e) => setFormData({...formData, saveIntervalSeconds: Number(e.target.value) })}
+                                        placeholder="7200"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Backup Count</Label>
+                                    <Input
+                                        value={formData.backupCount}
+                                        type="number"
+                                        onChange={(e) => setFormData({...formData, backupCount: Number(e.target.value) })}
+                                        placeholder="3"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Initial Backup (seconds)</Label>
+                                    <Input
+                                        value={formData.initialBackupSeconds}
+                                        type="number"
+                                        onChange={(e) => setFormData({...formData, initialBackupSeconds: Number(e.target.value) })}
+                                        placeholder="7200"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Backup Interval (seconds)</Label>
+                                    <Input
+                                        value={formData.backupIntervalSeconds}
+                                        type="number"
+                                        onChange={(e) => setFormData({...formData, backupIntervalSeconds: Number(e.target.value) })}
+                                        placeholder="43200"
+                                    />
+                                </div>
+                            </CollapsibleContent>
+                        </Collapsible>
+
                         <Button type="submit" className="w-full">Create Server</Button>
                     </form>
                 </CardContent>

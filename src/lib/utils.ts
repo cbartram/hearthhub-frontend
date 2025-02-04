@@ -13,22 +13,10 @@ interface CreateUserRequest {
   avatar_id: string
 }
 
-// interface CognitoUser {
-//   cognitoId: string
-//   discordId: string,
-//   discordUsername: string,
-//   discordEmail: string,
-//   avatarId: string,
-//   accountEnabled: boolean
-//   credentials: Credentials
-// }
-//
-// interface Credentials {
-//   refresh_token: string
-//   token_expiration: number
-//   access_token: string
-//   id_token: string
-// }
+export async function createServer() {
+
+}
+
 
 /**
  * Creates a new user in Cognito. If the user already exists it will be returned instead.

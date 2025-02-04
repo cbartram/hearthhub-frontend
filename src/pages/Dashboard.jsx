@@ -1,11 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {useAuth} from '@/context/AuthContext.jsx'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import {Search, Download, Plus} from 'lucide-react';
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import CreateServer from '@/components/CreateServer'
@@ -44,11 +38,16 @@ const Dashboard = () => {
         ));
     };
 
+    const handleCreateServer = (server) => {
+        setActiveView('servers')
+        setServers([...servers, server])
+    }
+
     const renderViews = () => {
         const serverList = <ServersList servers={servers} onServerCreateButtonClick={() => setActiveView('create-server')} />
         switch (activeView) {
             case "create-server":
-                return <CreateServer />
+                return <CreateServer onServerCreate={(s) => handleCreateServer(s)} />
             case "servers":
                 return serverList
             case "mods":
