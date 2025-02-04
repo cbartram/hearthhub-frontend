@@ -33,7 +33,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
     return (
         <div className="w-64 bg-gray-200 text-secondary-foreground border-r p-4">
-            <h1 className="text-2xl font-bold mb-8">HearthHub</h1>
+            <h1 className="text-2xl font-bold mb-8">Navigation</h1>
             <nav className="space-y-2">
                 {navItems.map((item) => (
                     <Button
