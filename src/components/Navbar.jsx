@@ -5,7 +5,7 @@ import HearthHubLogo from '@/assets/hearthhub_logo.png'
 
 
 const Navbar = ({ onLogout, userId, avatarId }) => (
-    <div className="bg-slate-800 text-white p-4">
+    <div className="bg-slate-700 text-white p-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-6">
                 <span className="w-12 h-12 rounded-full">

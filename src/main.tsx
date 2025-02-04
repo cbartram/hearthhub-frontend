@@ -7,7 +7,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 // @ts-ignore
 import AuthCallback from "@/components/AuthCallback.jsx";
 import Login from '@/pages/Login.tsx'
-import Dashboard from '@/pages/Dashboard.tsx'
+import Dashboard from '@/pages/Dashboard.jsx'
 
 // @ts-ignore
 import { RedirectIfAuthenticated } from '@/components/RedirectIfAuthenticated'
