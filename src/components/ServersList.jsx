@@ -30,7 +30,8 @@ const ServersList = ({ servers, onServerCreateButtonClick }) => {
                                     <CardDescription>World: {server.worldName}</CardDescription>
                                     <div className="flex space-x-2 mt-2">
                                         <Badge
-                                            variant={server.isRunning ? "default" : "destructive"}
+                                            variant={server.isRunning ? "secondary" : "destructive"}
+                                            className="bg-green-400"
                                         >
                                             {server.isRunning ? 'Running' : 'Stopped'}
                                         </Badge>
@@ -38,7 +39,7 @@ const ServersList = ({ servers, onServerCreateButtonClick }) => {
                                             <Badge variant="secondary">Crossplay</Badge>
                                         )}
                                         {server.isPublic && (
-                                            <Badge variant="outline">Public</Badge>
+                                            <Badge variant="secondary">Public</Badge>
                                         )}
                                     </div>
                                 </div>

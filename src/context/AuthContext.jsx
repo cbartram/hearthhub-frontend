@@ -3,7 +3,7 @@ import {createCognitoUser} from '@/lib/utils.ts'
 import {BASE_URL} from "@/constants.ts";
 const AuthContext = createContext(null);
 
-// AuthProvider is used in main.tsx and provides the login, logout, and user props to any component
+// AuthProvider is used in main.jsx and provides the login, logout, and user props to any component
 // in the Tree. AuthProvider wraps all components (currently) so that any component can get information about
 // the currently authenticated user.
 export const AuthProvider = ({ children }) => {

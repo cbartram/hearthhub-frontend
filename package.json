@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
-    "proxy": "echo 'M7F03s9MfbNvfgDG5B5XIxNgk8dc'"
+    "preview": "vite preview",
+    "deploy": "aws s3 rm --recursive s3://hearthhub-ui/ && aws s3 sync dist/ s3://hearthhub-ui"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.1",
