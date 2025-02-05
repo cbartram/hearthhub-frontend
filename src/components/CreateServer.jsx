@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Check } from "lucide-react"
 import {
     Card,
     CardContent,
@@ -42,11 +43,43 @@ const CreateServer = ({ onServerCreate }) => {
         backupIntervalSeconds: 43200,
     });
 
+    const [worldSelect, setWorldSelect] = useState('new')
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
         onServerCreate({ ...formData })
     };
+
+    const world = () => {
+        return (
+            <>
+                <Label>World Name</Label>
+                <Input
+                    value={formData.world}
+                    onChange={(e) => setFormData({...formData, world: e.target.value})}
+                    placeholder="Midgard Realm"
+                    required
+                />
+
+                <Label>Select Existing World</Label>
+                <Select
+                    value={formData.world}
+                    onValueChange={(value) => setFormData({...formData, world: value})}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Existing World" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="veryeasy">World 1</SelectItem>
+                        <SelectItem value="veryeasy">World 2</SelectItem>
+                        <SelectItem value="veryeasy">World 3</SelectItem>
+                        <SelectItem value="veryeasy">World 4</SelectItem>
+                    </SelectContent>
+                </Select>
+            </>
+        )
+    }
 
     return (
         <div className="p-0">
@@ -68,14 +101,48 @@ const CreateServer = ({ onServerCreate }) => {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>World Name</Label>
-                                <Input
-                                    value={formData.world}
-                                    onChange={(e) => setFormData({...formData, world: e.target.value})}
-                                    placeholder="Midgard Realm"
-                                    required
-                                />
+                                <Label>Select an Option</Label>
+                                <RadioGroup defaultValue="comfortable">
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem className={worldSelect === "new" ? 'bg-black' : 'bg-gray-100'} value="new" id="r1" onClick={() => setWorldSelect('new')} />
+                                        <Label htmlFor="r1">New World</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem className={worldSelect === "existing" ? '' : 'bg-gray-100'} value="existing" id="r2"  onClick={() => setWorldSelect('existing')} />
+                                        <Label htmlFor="r2">Existing World</Label>
+                                    </div>
+                                </RadioGroup>
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            {
+                                worldSelect === 'new' ? <>
+                                    <Label>World Name</Label>
+                                    <Input
+                                        value={formData.world}
+                                        onChange={(e) => setFormData({...formData, world: e.target.value})}
+                                        placeholder="Midgard Realm"
+                                        required
+                                    />
+                                </> : <>
+                                    <Label>Select Existing World</Label>
+                                    <Select
+                                        value={formData.world}
+                                        onValueChange={(value) => setFormData({...formData, world: value})}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Existing World" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="veryeasy">World 1</SelectItem>
+                                            <SelectItem value="veryeasy">World 2</SelectItem>
+                                            <SelectItem value="veryeasy">World 3</SelectItem>
+                                            <SelectItem value="veryeasy">World 4</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </>
+                            }
                         </div>
 
                         <div className="space-y-2">
