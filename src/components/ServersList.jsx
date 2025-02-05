@@ -17,7 +17,7 @@ const ServersList = ({ servers, onServerCreateButtonClick }) => {
             ) : (
                 <div className="grid gap-4">
                     {servers.map(server => (
-                        <ServerDetailsCard serverData={server} />
+                        <ServerDetailsCard key={server.name} serverData={server} />
                     ))}
                 </div>
             )}

@@ -6,10 +6,11 @@ import CreateServer from '@/components/CreateServer'
 import ServersList from "@/components/ServersList.jsx";
 import ModInstall from "@/components/ModInstall";
 import Backups from "@/components/Backups";
-import {K8S_BASE_URL} from "@/lib/constants.ts";
+import ApiClient from "@/lib/api.js";
 
 const Dashboard = () => {
     const {user, logout} = useAuth()
+    const apiClient = new ApiClient(user);
     const [activeView, setActiveView] = useState('servers');
     const [servers, setServers] = useState([
         {
@@ -58,17 +59,17 @@ const Dashboard = () => {
         { id: 3, name: 'Epic Loot', downloads: '100K+', installed: false },
         { id: 4, name: 'Plant Everything', downloads: '75K+', installed: false }
     ];
-    const [mods, setMods] = useState(sampleMods);
 
+    const [mods, setMods] = useState(sampleMods);
     const handleModToggle = (modId) => {
         setMods(mods.map(mod =>
             mod.id === modId ? { ...mod, installed: !mod.installed } : mod
         ));
+
     };
-
     const [socket, setSocket] = useState(null);
-    const [messages, setMessages] = useState([]);
 
+    const [messages, setMessages] = useState([]);
     useEffect(() => {
         // TODO something about hearthhub.duckdns.org is causing issues here.
         const ws = new WebSocket(`http://71.77.136.117/ws?id=${user.discordId}`);
@@ -102,11 +103,6 @@ const Dashboard = () => {
 
     const handleCreateServer = (server) => {
         setActiveView('servers')
-
-        const headers = new Headers();
-        headers.append("Authorization", `Basic ${btoa(user.discordId + ":" + user.credentials.refresh_token)}`)
-        headers.append("Content-Type", "application/json");
-
         const specificKeys = ['combat', 'deathpenalty', 'resources', 'raids', 'portals'];
         const modifiers = [];
 
@@ -129,16 +125,9 @@ const Dashboard = () => {
             "backup_interval_seconds": server.backupIntervalSeconds
         });
 
-        fetch(`${K8S_BASE_URL}/api/v1/server/create`, {
-            method: "POST",
-            headers,
-            body,
-            redirect: "follow"
-        }).then((response) => response.json())
-            .then((result) => console.log(result))
-            .catch((error) => console.error(error));
-
-        setServers([...servers, server])
+        apiClient.createServer(body).then((server) => setServers([...servers, server])).catch(err => {
+            console.error("api request to create server failed: ", err)
+        })
     }
 
     const renderViews = () => {

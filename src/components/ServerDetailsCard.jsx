@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Users, Server, Clock, Database } from 'lucide-react';
+import { Shield, Users, Server, Clock } from 'lucide-react';
 
-const ServerDetailsCard = ({ serverData }) => {
+const ServerDetailsCard = ({ serverData, key }) => {
     const { server_ip, server_port, world_details, state } = serverData;
 
     const getModifierBadgeColor = (value) => {
@@ -22,7 +22,7 @@ const ServerDetailsCard = ({ serverData }) => {
     };
 
     return (
-        <Card className="w-full max-w-2xl">
+        <Card className="w-full max-w-2xl" key={key}>
             <CardHeader>
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-xl font-bold">
@@ -30,7 +30,7 @@ const ServerDetailsCard = ({ serverData }) => {
                     </CardTitle>
                     <Badge
                         variant="secondary"
-                        className={state === 'running' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
+                        className={state === 'running' ? 'bg-green-100 text-green-800 p-3 text-md' : 'bg-yellow-100 p-3 text-yellow-800'}
                     >
                         {state}
                     </Badge>
