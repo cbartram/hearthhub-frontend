@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, Check } from "lucide-react"
+import { ChevronDown, AlertCircle } from "lucide-react"
 import {
     Card,
     CardContent,
@@ -12,6 +12,11 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card";
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch";
 import {
     Select,
@@ -43,43 +48,24 @@ const CreateServer = ({ onServerCreate }) => {
         backupIntervalSeconds: 43200,
     });
 
+    const [errorData ,setErrorData] = useState({})
     const [worldSelect, setWorldSelect] = useState('new')
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onServerCreate({ ...formData })
+        const err = {}
+
+        if(formData.password.length < 4) {
+            err['password'] = 'Your server password cannot be less than 4 characters.'
+        }
+
+        if(Object.keys(err).length > 0) {
+            setErrorData({...errorData, ...err})
+        } else {
+            onServerCreate({...formData})
+        }
     };
-
-    const world = () => {
-        return (
-            <>
-                <Label>World Name</Label>
-                <Input
-                    value={formData.world}
-                    onChange={(e) => setFormData({...formData, world: e.target.value})}
-                    placeholder="Midgard Realm"
-                    required
-                />
-
-                <Label>Select Existing World</Label>
-                <Select
-                    value={formData.world}
-                    onValueChange={(value) => setFormData({...formData, world: value})}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select Existing World" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="veryeasy">World 1</SelectItem>
-                        <SelectItem value="veryeasy">World 2</SelectItem>
-                        <SelectItem value="veryeasy">World 3</SelectItem>
-                        <SelectItem value="veryeasy">World 4</SelectItem>
-                    </SelectContent>
-                </Select>
-            </>
-        )
-    }
 
     return (
         <div className="p-0">
@@ -89,6 +75,23 @@ const CreateServer = ({ onServerCreate }) => {
                     <CardDescription>Configure your dedicated Valheim server settings</CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {
+                        Object.keys(errorData).length > 0 ?
+                        <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>Error</AlertTitle>
+                            <AlertDescription>
+                                <ul>
+                                    {
+                                        Object.keys(errorData).map(key => {
+                                            return <li key={key}>{errorData[key]}</li>
+                                        })
+                                    }
+                                </ul>
+                            </AlertDescription>
+                        </Alert> : <></>
+                    }
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -276,6 +279,8 @@ const CreateServer = ({ onServerCreate }) => {
                                         type="number"
                                         onChange={(e) => setFormData({...formData, saveIntervalSeconds: Number(e.target.value) })}
                                         placeholder="7200"
+                                        min={300}
+                                        max={86400}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -285,6 +290,8 @@ const CreateServer = ({ onServerCreate }) => {
                                         type="number"
                                         onChange={(e) => setFormData({...formData, backupCount: Number(e.target.value) })}
                                         placeholder="3"
+                                        min={1}
+                                        max={3}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -294,6 +301,8 @@ const CreateServer = ({ onServerCreate }) => {
                                         type="number"
                                         onChange={(e) => setFormData({...formData, initialBackupSeconds: Number(e.target.value) })}
                                         placeholder="7200"
+                                        min={300}
+                                        max={86400}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -303,6 +312,8 @@ const CreateServer = ({ onServerCreate }) => {
                                         type="number"
                                         onChange={(e) => setFormData({...formData, backupIntervalSeconds: Number(e.target.value) })}
                                         placeholder="43200"
+                                        min={14400}
+                                        max={86400}
                                     />
                                 </div>
                             </CollapsibleContent>
