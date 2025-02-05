@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import {BASE_URL} from "@/constants.ts";
+import {BASE_URL} from "@/lib/constants.ts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

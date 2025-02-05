@@ -1,9 +1,7 @@
-// @ts-ignore
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from "@/assets/hearthhub_logo.png";
-import {BASE_URL} from "@/constants.ts";
-// @ts-ignore
+import {BASE_URL} from "@/lib/constants.ts";
 import {useAuth} from "@/context/AuthContext.jsx"
 
 const AuthCallback = () => {

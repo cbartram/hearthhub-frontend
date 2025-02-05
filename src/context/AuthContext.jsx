@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import {createCognitoUser} from '@/lib/utils.ts'
-import {BASE_URL} from "@/constants.ts";
+import {BASE_URL} from "@/lib/constants.ts";
 const AuthContext = createContext(null);
 
 // AuthProvider is used in main.jsx and provides the login, logout, and user props to any component

@@ -35,11 +35,11 @@ const CreateServer = ({ onServerCreate }) => {
         isPublic: false,
 
         // Modifiers
-        difficulty: '',
-        deathPenalty: '',
-        resources: '',
-        raids: '',
-        portals: '',
+        combat: 'standard',
+        deathpenalty: 'standard',
+        resources: 'standard',
+        raids: 'standard',
+        portals: 'standard',
 
         // Advanced
         saveIntervalSeconds: 1800,
@@ -186,23 +186,24 @@ const CreateServer = ({ onServerCreate }) => {
                                 <div className="space-y-2">
                                     <Label>Combat Difficulty</Label>
                                     <Select
-                                        value={formData.difficulty}
-                                        onValueChange={(value) => setFormData({...formData, difficulty: value})}
+                                        value={formData.combat}
+                                        onValueChange={(value) => setFormData({...formData, combat: value})}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select Difficulty" />
+                                            <SelectValue placeholder="Select Combat Difficulty" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="veryeasy">Very Easy</SelectItem>
                                             <SelectItem value="easy">Easy</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
                                             <SelectItem value="hard">Hard</SelectItem>
                                             <SelectItem value="veryhard">Very Hard</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <Label>Death Penalty</Label>
                                     <Select
-                                        value={formData.deathPenalty}
-                                        onValueChange={(value) => setFormData({...formData, deathPenalty: value})}
+                                        value={formData.deathpenalty}
+                                        onValueChange={(value) => setFormData({...formData, deathpenalty: value})}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Death Penalty" />
@@ -211,6 +212,7 @@ const CreateServer = ({ onServerCreate }) => {
                                             <SelectItem value="casual">Casual</SelectItem>
                                             <SelectItem value="veryeasy">Very Easy</SelectItem>
                                             <SelectItem value="easy">Easy</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
                                             <SelectItem value="hard">Hard</SelectItem>
                                             <SelectItem value="hardcore">Hardcore</SelectItem>
                                         </SelectContent>
@@ -226,6 +228,7 @@ const CreateServer = ({ onServerCreate }) => {
                                         <SelectContent>
                                             <SelectItem value="muchless">Much Less</SelectItem>
                                             <SelectItem value="less">Less</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
                                             <SelectItem value="more">More</SelectItem>
                                             <SelectItem value="muchmore">Much More</SelectItem>
                                             <SelectItem value="most">Most</SelectItem>
@@ -243,6 +246,7 @@ const CreateServer = ({ onServerCreate }) => {
                                             <SelectItem value="none">None</SelectItem>
                                             <SelectItem value="muchless">Much Less</SelectItem>
                                             <SelectItem value="less">Less</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
                                             <SelectItem value="more">More</SelectItem>
                                             <SelectItem value="muchmore">Much More</SelectItem>
                                         </SelectContent>
@@ -257,6 +261,7 @@ const CreateServer = ({ onServerCreate }) => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="casual">Casual</SelectItem>
+                                            <SelectItem value="standard">Standard</SelectItem>
                                             <SelectItem value="hard">Hard</SelectItem>
                                             <SelectItem value="veryhard">Very Hard</SelectItem>
                                         </SelectContent>

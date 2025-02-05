@@ -9,7 +9,7 @@ import {
     AlertDescription,
     AlertTitle,
 } from "@/components/ui/alert"
-import {isProd} from "@/constants.ts";
+import {isProd} from "@/lib/constants.ts";
 
 const discordRedirect = () => {
     if(isProd()) {

@@ -1,12 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardTitle
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import ServerDetailsCard from "@/components/ServerDetailsCard.jsx";
 
 
 const ServersList = ({ servers, onServerCreateButtonClick }) => {
@@ -23,34 +17,7 @@ const ServersList = ({ servers, onServerCreateButtonClick }) => {
             ) : (
                 <div className="grid gap-4">
                     {servers.map(server => (
-                        <Card key={server.id}>
-                            <CardContent className="p-6 flex justify-between items-center">
-                                <div>
-                                    <CardTitle>{server.name}</CardTitle>
-                                    <CardDescription>World: {server.worldName}</CardDescription>
-                                    <div className="flex space-x-2 mt-2">
-                                        <Badge
-                                            variant={server.isRunning ? "secondary" : "destructive"}
-                                            className="bg-green-400"
-                                        >
-                                            {server.isRunning ? 'Running' : 'Stopped'}
-                                        </Badge>
-                                        {server.isCrossplay && (
-                                            <Badge variant="secondary">Crossplay</Badge>
-                                        )}
-                                        {server.isPublic && (
-                                            <Badge variant="secondary">Public</Badge>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex space-x-2">
-                                    <Button variant="outline">Details</Button>
-                                    <Button>
-                                        {server.isRunning ? 'Stop' : 'Start'}
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <ServerDetailsCard serverData={server} />
                     ))}
                 </div>
             )}
