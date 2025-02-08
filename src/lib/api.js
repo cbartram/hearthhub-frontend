@@ -1,26 +1,24 @@
-import {K8S_BASE_URL} from "@/lib/constants.ts";
+import {K8S_BASE_URL, BASE_URL} from "@/lib/constants.ts";
+
 
 class ApiClient {
     constructor(user) {
-        this.baseURL = K8S_BASE_URL;
         this.user = user
     }
 
-    getHeaders() {
-        const headers = new Headers();
-        headers.append("Authorization", `Basic ${btoa(this.user.discordId + ":" + this.user.credentials.refresh_token)}`);
-        headers.append("Content-Type", "application/json");
-        return headers;
-    }
-
-    // Generic request method
+    /**
+     * Makes a generic asynchronous request to an API endpoint using the fetch API.
+     * @param endpoint The endpoint to make a request to not including the base URL. i.e. /api/v1/health
+     * @param options Any fetch options to pass along to the request including request method and body.
+     * @returns {Promise<Response|any>}
+     */
     async request(endpoint, options = {}) {
-        const url = `${this.baseURL}${endpoint}`;
+        const url = `${this.getBaseUrl()}${endpoint}`;
         const headers = this.getHeaders();
 
         const config = {
-            ...options,
             headers,
+            ...options,
         };
 
         try {
@@ -42,6 +40,83 @@ class ApiClient {
             console.error('API request failed:', error);
             throw error;
         }
+    }
+
+    getHeaders() {
+        throw new Error("Method getHeaders() must be implemented.")
+    }
+
+    getBaseUrl() {
+        throw new Error("Method getBaseUrl() must be implemented.")
+    }
+}
+
+/**
+ * HearthHub API client provides a frontend abstraction for:
+ * - The Lambda API client responsible for discord sign-up, login, and file upload / fetching from S3.
+ */
+class HearthHubApiClient extends ApiClient {
+    constructor(user) {
+        super(user);
+        this.baseURL = BASE_URL
+    }
+
+    getBaseUrl() {
+        return this.baseURL
+    }
+
+    getHeaders() {
+        const headers = new Headers();
+        headers.append("Authorization", `Bearer ${this.user.credentials.id_token}`);
+        headers.append("Content-Type", "application/json");
+        return headers;
+    }
+
+    async listFiles(type) {
+        const validTypes = {
+            "mods": "",
+            "mods/": "",
+            "configs": "",
+            "configs/": "",
+            "backups": "",
+            "backups/": ""
+        }
+
+        if(!(type in validTypes)) {
+            console.error(`${type} is not a valid file prefix.`)
+            return Promise.reject(`${type} is not a valid file prefix`)
+        }
+
+        return this.request(`/prod/api/v1/file?discordId=${this.user.discordId}&prefix=${type}&refreshToken=${this.user.credentials.refresh_token}`, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${this.user.credentials.id_token}`,
+                "Content-Type": "application/json"
+            }
+        });
+    }
+}
+
+
+/**
+ * Functions as the client for the Kubernetes API client hosted on the kubernetes cluster.
+ * This API is responsible for all server, file install, and backup operations.
+ */
+class KubeApiClient extends ApiClient {
+    constructor(user) {
+        super(user)
+        this.baseURL = K8S_BASE_URL;
+    }
+
+    getHeaders() {
+        const headers = new Headers();
+        headers.append("Authorization", `Basic ${btoa(this.user.discordId + ":" + this.user.credentials.refresh_token)}`);
+        headers.append("Content-Type", "application/json");
+        return headers;
+    }
+
+    getBaseUrl() {
+        return this.baseURL
     }
 
     async getServer() {
@@ -79,4 +154,7 @@ class ApiClient {
 }
 
 // Create and export a singleton instance
-export default ApiClient;
+export {
+    KubeApiClient,
+    HearthHubApiClient
+};

@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Users, Server, Clock } from 'lucide-react';
 
-const ServerDetailsCard = ({ serverData, key }) => {
+const ServerDetailsCard = ({ serverData, id }) => {
     const { server_ip, server_port, world_details, state } = serverData;
 
     const getModifierBadgeColor = (value) => {
@@ -22,7 +22,7 @@ const ServerDetailsCard = ({ serverData, key }) => {
     };
 
     return (
-        <Card className="w-full max-w-2xl" key={key}>
+        <Card className="w-full max-w-2xl" key={id}>
             <CardHeader>
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-xl font-bold">
@@ -83,9 +83,9 @@ const ServerDetailsCard = ({ serverData, key }) => {
                         <span>Game Modifiers</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        {world_details.modifiers.map(({ key, value }) => (
+                        {world_details.modifiers.map(({ key, value }, i) => (
                             <Badge
-                                key={key}
+                                key={i}
                                 className={getModifierBadgeColor(value)}
                             >
                                 {key}: {value}

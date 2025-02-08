@@ -13,8 +13,25 @@ interface CreateUserRequest {
   avatar_id: string
 }
 
-export async function createServer() {
+export function formatBytes(bytes: number): string {
+  const MB = 1024 * 1024; // 1 MB = 1024 * 1024 bytes
+  const GB = 1024 * MB;   // 1 GB = 1024 MB
+  const TB = 1024 * GB;   // 1 TB = 1024 GB
 
+  if(`${(bytes / MB).toFixed(2)} MB` == "0.00 MB") {
+    return "0.01 MB"
+  }
+
+  if (bytes < GB) {
+    // Convert to MB if size is less than 1 GB
+    return `${(bytes / MB).toFixed(2)} MB`;
+  } else if (bytes < TB) {
+    // Convert to GB if size is less than 1 TB
+    return `${(bytes / GB).toFixed(2)} GB`;
+  } else {
+    // Convert to TB otherwise
+    return `${(bytes / TB).toFixed(2)} TB`;
+  }
 }
 
 
