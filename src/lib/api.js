@@ -25,6 +25,7 @@ class ApiClient {
             const response = await fetch(url, config);
 
             if (!response.ok) {
+                console.error("error during http fetch")
                 const errorData = await response.json().catch(() => null);
                 throw new Error(errorData?.message || `HTTP error status: ${response.status}`);
             }

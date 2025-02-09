@@ -47,7 +47,7 @@ const ModInstall = ({mods, handleModToggle}) => {
                 </div>
                 <div className="space-y-2">
                     {mods.map(m => (
-                        <div key={m.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={`${m.name}_${m.id}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                             <div>
                                 <h3 className="font-medium">{m.name}</h3>
                                 <div className="flex flex-wrap gap-2">

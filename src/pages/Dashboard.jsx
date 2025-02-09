@@ -47,7 +47,6 @@ const Dashboard = () => {
                        installing: false,
                    }
                })
-               console.log('loaded user defined mods: ', m)
                setMods([...mods, ...m])
            }
        }).catch(err => {
@@ -119,10 +118,10 @@ const Dashboard = () => {
     // TODO Make API request to install the mod or uninstall the mod and update state till
     // the websocket notifies the operation completed!
     const handleModToggle = (modId) => {
-        setMods(mods.map(mod =>
+        const newMods = mods.map(mod =>
             mod.id === modId ? { ...mod, installed: !mod.installed } : mod
-        ));
-
+        )
+        setMods([...newMods]);
     };
 
     const renderViews = () => {
