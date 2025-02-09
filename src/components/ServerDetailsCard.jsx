@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {Shield, Users, Server, Clock, LoaderCircle} from 'lucide-react';
+import {Shield, Users, Server, Clock, LoaderCircle, RotateCcw, Play, Pause, Trash} from 'lucide-react';
+import {Button} from "@/components/ui/button";
 
 const ServerDetailsCard = ({ serverData, id }) => {
     const { server_ip, server_port, world_details, state } = serverData;
@@ -62,12 +63,36 @@ const ServerDetailsCard = ({ serverData, id }) => {
                     <span className="mx-2">Running</span>
                 </Badge>
             case "stopped":
+            case "terminated":
                 return <Badge
                     variant="secondary"
                     className="bg-red-100 text-red-800 p-3 text-md"
                 >
                     <span className="mx-2">Stopped</span>
                 </Badge>
+            default:
+                return <Badge
+                    variant="secondary"
+                    className="bg-gray-200 text-gray-800 p-3 text-md"
+                >
+                    <span className="mx-2">Unknown</span>
+                </Badge>
+        }
+    }
+
+    const renderActionButtons = () => {
+        switch (state) {
+            case "terminated":
+            case "stopped": // -> show start button
+                return <Button className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6">
+                    <Play /> Start
+                </Button>
+            case "running": // -> show stop button
+                return
+            case "loading": // -> show disabled start button
+                return
+            default:
+                // show restart button
         }
     }
 
@@ -157,6 +182,25 @@ const ServerDetailsCard = ({ serverData, id }) => {
                         </div>
                         <div className="text-sm">
                             <span className="font-medium">Backup Interval:</span> {world_details.backup_interval_seconds / 3600} hours
+                        </div>
+                    </div>
+
+
+                    <div className="space-y-2">
+                        <div className="flex items-center ap-2 text-sm text-muted-foreground">
+                            <RotateCcw className="h-4 w-4" />
+                            <span>Actions</span>
+                        </div>
+                        <div className="gap-2 flex flex-grow">
+                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6">
+                                <Play /> Start
+                            </Button>
+                            <Button disabled={state !== "running"} className="bg-blue-200 text-blue-800 hover:bg-blue-300 my-2 py-6">
+                                <Pause /> Stop
+                            </Button>
+                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-red-200 text-red-800 hover:bg-red-300 my-2 py-6">
+                                <Trash /> Delete
+                            </Button>
                         </div>
                     </div>
                 </div>

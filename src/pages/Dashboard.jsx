@@ -87,16 +87,18 @@ const Dashboard = () => {
                     break
                 case "PreStop":
                     if(content.containerType === "file-install") {
-                        setMods([...mods.map(m => {
-                            if(m.installing) {
-                                return {
-                                    ...m,
-                                    installing: false,
-                                    installed: content.operation
+                        setMods([
+                            ...mods.map(m => {
+                                if(m.installing) {
+                                    return {
+                                        ...m,
+                                        installing: false,
+                                        installed: content.operation === "write"
+                                    }
                                 }
-                            }
-                            return m
-                        })])
+                                return m
+                            })
+                        ])
                     } else if (content.containerType === "server") {
                         // Update the servers state to "stopped"
                         updateServerState('stopped', content.containerName)
@@ -171,7 +173,7 @@ const Dashboard = () => {
         setMods([...newMods]);
 
         // Prefix in S3 will differ between default mods and user uploaded mods
-        const prefix = mod.default ? `mods/default/${mod.name}.zip` : `mods/${user.discordId}/${mod.name}.zip`
+        const prefix = mod.default ? `mods/general/${mod.name}.zip` : `mods/${user.discordId}/${mod.name}.zip`
         kubeApi.installFile({
             prefix,
             destination: "/valheim/BepInEx/plugins",
