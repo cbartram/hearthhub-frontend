@@ -21,7 +21,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick }) => {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                    {/* Connection Details */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Server className="h-4 w-4" />
@@ -33,7 +32,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick }) => {
                         </div>
                     </div>
 
-                    {/* World Settings */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Users className="h-4 w-4" />
@@ -47,7 +45,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick }) => {
                         </div>
                     </div>
 
-                    {/* Game Modifiers */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Shield className="h-4 w-4" />
@@ -61,7 +58,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick }) => {
                         </div>
                     </div>
 
-                    {/* Backup Settings */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Clock className="h-4 w-4" />

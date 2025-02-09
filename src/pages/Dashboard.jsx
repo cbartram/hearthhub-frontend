@@ -9,6 +9,8 @@ import Backups from "@/components/Backups";
 import {KubeApiClient, HearthHubApiClient} from "@/lib/api.js";
 import {formatBytes} from "@/lib/utils.ts";
 
+const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
+
 const Dashboard = () => {
     const {user, logout} = useAuth()
     const kubeApi = new KubeApiClient(user);
@@ -18,8 +20,6 @@ const Dashboard = () => {
     const [serversLoading, setServersLoading] = useState(true)
     const [servers, setServers] = useState([])
     const [mods, setMods] = useState([]);
-    const [socket, setSocket] = useState(null);
-    const [messages, setMessages] = useState([]);
 
     useEffect(() => {
        kubeApi.getServer().then(server => {
@@ -39,52 +39,98 @@ const Dashboard = () => {
                    let filename = parts[parts.length - 1];
                    filename = filename.slice(0, -4);
 
-                   return {
+                   const remappedMod = {
                        id: i,
                        name: filename,
                        size: formatBytes(file.fileSize),
+                       default: DEFAULT_MODS.includes(filename),
                        installed: false,
                        installing: false,
                    }
+
+                   for (const userInstalledMod in user.installedMods) {
+                       if(userInstalledMod.name === filename) {
+                           remappedMod.installed = true
+                       }
+                   }
+
+                   return remappedMod
                })
-               setMods([...mods, ...m])
+               setMods([...m])
            }
        }).catch(err => {
            console.error("failed to list mods: ", err)
        })
-
     }, [])
 
     useEffect(() => {
         // TODO something about hearthhub.duckdns.org is causing issues here.
         const ws = new WebSocket(`http://71.77.136.117/ws?id=${user.discordId}`);
 
-        ws.addEventListener('open', () => {
-            console.log('websockets connected');
-        });
-
         ws.addEventListener('message', (event) => {
-            const message = event.data;
-            setMessages((prevMessages) => [...prevMessages, message]);
-            console.log('received message:', message);
+            console.log("Servers within websocket handler: ", servers)
+
+            const message = JSON.parse(event.data)
+            console.log('received ws message:', message);
+            const content = JSON.parse(message.content)
+
+            switch(message.type) {
+                case "PostStart":
+                    // Update the servers state to "loading"
+                    updateServerState('loading', content.containerName)
+                    break
+                case "ContainerReady":
+                    if(content.containerType === "server") {
+                        // Update the servers state to "running"
+                        updateServerState('running', content.containerName)
+                    }
+                    break
+                case "PreStop":
+                    if(content.containerType === "file-install") {
+                        setMods([...mods.map(m => {
+                            if(m.installing) {
+                                return {
+                                    ...m,
+                                    installing: false,
+                                    installed: content.operation
+                                }
+                            }
+                            return m
+                        })])
+                    } else if (content.containerType === "server") {
+                        // Update the servers state to "stopped"
+                        updateServerState('stopped', content.containerName)
+                    }
+                    break
+                default:
+                    console.log(`unknown message type: ${message.type} content = ${message.content}`)
+            }
         });
 
         ws.addEventListener('error', (event) => {
             console.error('websocket error:', event);
         });
 
-        ws.addEventListener('close', () => {
-            console.log('websocket disconnected');
-        });
-
-        setSocket(ws);
-
         return () => {
             if (ws) {
                 ws.close();
             }
         };
-    }, []);
+    }, [servers]);
+
+    const updateServerState = (state, containerName) => {
+        setServers([
+            ...servers.map(s => {
+                if(s.deployment_name === containerName) {
+                    return {
+                        ...s,
+                        state
+                    }
+                }
+                return s
+            })
+        ])
+    }
 
     const handleCreateServer = (server) => {
         setActiveView('servers')
@@ -97,20 +143,20 @@ const Dashboard = () => {
             }
         }
 
-        const body = JSON.stringify({
+        const body = {
             "name": server.name,
             "world": server.world,
             "password": server.password,
             "public": server.isPublic,
             "enable_crossplay": server.isCrossplay,
             "modifiers": modifiers,
-            "save_interval_seconds": server.save_interval_seconds,
+            "save_interval_seconds": server.saveIntervalSeconds,
             "backup_count": server.backupCount,
             "initial_backup_seconds": server.initialBackupSeconds,
             "backup_interval_seconds": server.backupIntervalSeconds
-        });
+        };
 
-        apiClient.createServer(body).then((server) => setServers([...servers, server])).catch(err => {
+        kubeApi.createServer(body).then((server) => setServers([...servers,  {...server, state: 'scheduling'}])).catch(err => {
             console.error("api request to create server failed: ", err)
         })
     }
@@ -118,10 +164,24 @@ const Dashboard = () => {
     // TODO Make API request to install the mod or uninstall the mod and update state till
     // the websocket notifies the operation completed!
     const handleModToggle = (modId) => {
-        const newMods = mods.map(mod =>
-            mod.id === modId ? { ...mod, installed: !mod.installed } : mod
+        const mod = mods.filter(m => m.id === modId)[0]
+        const newMods = mods.map(m =>
+            m.id === modId ? { ...m, installing: true } : m
         )
         setMods([...newMods]);
+
+        // Prefix in S3 will differ between default mods and user uploaded mods
+        const prefix = mod.default ? `mods/default/${mod.name}.zip` : `mods/${user.discordId}/${mod.name}.zip`
+        kubeApi.installFile({
+            prefix,
+            destination: "/valheim/BepInEx/plugins",
+            is_archive: true,
+            operation: "write"
+        }).then(res => {
+            console.log('install mod response: ', res)
+        }).catch(err => {
+            console.error("failed to install mod: ", err)
+        })
     };
 
     const renderViews = () => {
@@ -132,8 +192,10 @@ const Dashboard = () => {
             case "servers":
                 return serverList
             case "mods":
-                console.log("mods: ", mods)
-                return <ModInstall mods={mods} handleModToggle={(id) => handleModToggle(id)} />
+                return <ModInstall
+                    mods={mods}
+                    handleModToggle={(id) => handleModToggle(id)}
+                />
             case "backups":
                 return <Backups />
             default:

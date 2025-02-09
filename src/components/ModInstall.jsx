@@ -6,7 +6,6 @@ import {Search, Download, LoaderCircle} from 'lucide-react';
 import {Badge} from "@/components/ui/badge";
 
 
-
 const ModInstall = ({mods, handleModToggle}) => {
 
     const getBadgeClass = (mod) => {
@@ -49,7 +48,8 @@ const ModInstall = ({mods, handleModToggle}) => {
                     {mods.map(m => (
                         <div key={`${m.name}_${m.id}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                             <div>
-                                <h3 className="font-medium">{m.name}</h3>
+                                {/* TODO it would be nice to have images for the mods in the future */}
+                                <h3 className="text-lg">{m.name}</h3>
                                 <div className="flex flex-wrap gap-2">
                                     <Badge
                                         variant="secondary"
@@ -57,6 +57,9 @@ const ModInstall = ({mods, handleModToggle}) => {
                                     >
                                         {getBadgeName(m) === "Installing" ? <div className="flex item-center justify-between"><span className="px-2">Installing</span> <LoaderCircle className="animate-spin" /></div> : getBadgeName(m)}
                                     </Badge>
+                                    {
+                                        m.default ? <Badge className="bg-green-200 my-2 text-green-800 text-md hover:bg-green-200">Default Mod</Badge> : <Badge variant="secondary" className="bg-yellow-100 my-2 text-yellow-800 text-md hover:bg-yellow-200">Custom Mod</Badge>
+                                    }
                                 </div>
                                 <p className="text-sm text-gray-500">
                                     <Download className="inline h-4 w-4 mr-1"/>

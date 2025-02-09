@@ -1,25 +1,75 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Users, Server, Clock } from 'lucide-react';
+import {Shield, Users, Server, Clock, LoaderCircle} from 'lucide-react';
 
 const ServerDetailsCard = ({ serverData, id }) => {
     const { server_ip, server_port, world_details, state } = serverData;
 
-    const getModifierBadgeColor = (value) => {
+    const getModifierBadgeColor = (key, value) => {
+        if(key === "raids") {
+            switch (value) {
+                case 'none':
+                case 'muchless':
+                case 'less':
+                    return 'bg-green-500 hover:bg-green-700';
+                case 'more':
+                case 'muchmore':
+                    return 'bg-red-500 hover:bg-red-700';
+                default:
+                    return 'bg-blue-500 hover:bg-blue-700';
+            }
+        }
+
+
         switch(value) {
             case 'easy':
             case 'veryeasy':
             case 'muchmore':
             case 'casual':
-                return 'bg-green-500';
+                return 'bg-green-500 hover:bg-green-700';
             case 'hard':
             case 'veryhard':
-                return 'bg-red-500';
+                return 'bg-red-500 hover:bg-red-700';
             default:
-                return 'bg-blue-500';
+                return 'bg-blue-500 hover:bg-blue-700';
         }
     };
+
+    const getBadge = (state) => {
+        switch(state) {
+            case "scheduling":
+                return <Badge
+                    variant="secondary"
+                    className="bg-yellow-100 text-yellow-800 p-3 text-md"
+                >
+                    <span className="mx-2">Scheduling Server...</span>
+                    <LoaderCircle className="animate-spin" />
+                </Badge>
+            case "loading":
+                return  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-800 p-3 text-md"
+                >
+                    <span className="mx-2">Starting Up...</span>
+                    <LoaderCircle className="animate-spin" />
+                </Badge>
+            case "running":
+                return <Badge
+                    variant="secondary"
+                    className="bg-green-100 text-green-800 p-3 text-md"
+                >
+                    <span className="mx-2">Running</span>
+                </Badge>
+            case "stopped":
+                return <Badge
+                    variant="secondary"
+                    className="bg-red-100 text-red-800 p-3 text-md"
+                >
+                    <span className="mx-2">Stopped</span>
+                </Badge>
+        }
+    }
 
     return (
         <Card className="w-full max-w-2xl" key={id}>
@@ -28,12 +78,7 @@ const ServerDetailsCard = ({ serverData, id }) => {
                     <CardTitle className="text-xl font-bold">
                         {world_details.name}
                     </CardTitle>
-                    <Badge
-                        variant="secondary"
-                        className={state === 'running' ? 'bg-green-100 text-green-800 p-3 text-md' : 'bg-yellow-100 p-3 text-yellow-800'}
-                    >
-                        {state}
-                    </Badge>
+                    {getBadge(state)}
                 </div>
             </CardHeader>
 
@@ -86,7 +131,7 @@ const ServerDetailsCard = ({ serverData, id }) => {
                         {world_details.modifiers.map(({ key, value }, i) => (
                             <Badge
                                 key={i}
-                                className={getModifierBadgeColor(value)}
+                                className={getModifierBadgeColor(key, value)}
                             >
                                 {key}: {value}
                             </Badge>
