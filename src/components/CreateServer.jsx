@@ -26,7 +26,7 @@ import {
     SelectValue
 } from "@/components/ui/select";
 
-const CreateServer = ({ onServerCreate }) => {
+const CreateServer = ({ onServerCreate, existingWorlds }) => {
     const [formData, setFormData] = useState({
         name: '',
         world: '',
@@ -66,6 +66,10 @@ const CreateServer = ({ onServerCreate }) => {
             onServerCreate({...formData})
         }
     };
+
+    const sanitizeWorldName = (name) => {
+        return name.slice(name.lastIndexOf("/") + 1, name.length - 3)
+    }
 
     return (
         <div className="p-0">
@@ -138,10 +142,12 @@ const CreateServer = ({ onServerCreate }) => {
                                             <SelectValue placeholder="Select Existing World" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="veryeasy">World 1</SelectItem>
-                                            <SelectItem value="veryeasy">World 2</SelectItem>
-                                            <SelectItem value="veryeasy">World 3</SelectItem>
-                                            <SelectItem value="veryeasy">World 4</SelectItem>
+                                            {
+                                                existingWorlds.length === 0 ? <SelectItem value="no-world">No Existing Worlds Found</SelectItem> :
+                                                existingWorlds.map(w => (
+                                                    <SelectItem value={sanitizeWorldName(w.key)} disabled={!w.installed}>{sanitizeWorldName(w.key)}{!w.installed && " (Not Installed)"}</SelectItem>
+                                                ))
+                                            }
                                         </SelectContent>
                                     </Select>
                                 </>

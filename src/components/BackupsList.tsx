@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Copy, DatabaseBackup} from 'lucide-react';
+import {Copy, DatabaseBackup, Download, Trash} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -12,20 +12,18 @@ import {
     TableRow
 } from '@/components/ui/table';
 
-// Types for better type safety
-type PrimaryBackup = {
+type Backup = {
     key: string;
     fileSize: number;
+    installing: boolean;
+    installed: boolean;
 };
 
-type ReplicaBackup = {
-    key: string;
-    fileSize: number;
-};
 
 type BackupListProps = {
-    primaryBackups: PrimaryBackup[];
-    replicaBackups: ReplicaBackup[];
+    primaryBackups: Backup[];
+    replicaBackups: Backup[];
+    onBackupAction: Function
 };
 
 const formatFileSize = (sizeInBytes: number): string => {
@@ -49,10 +47,15 @@ const formatTimestamp = (timestamp: string): string => {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
 
-const BackupList: React.FC<BackupListProps> = ({
-                                                          primaryBackups,
-                                                          replicaBackups
-                                                      }) => {
+const renderBadge = (backup: Backup) => {
+    if(backup.installed) {
+        return <Badge className="bg-green-200 text-green-800 hover:bg-green-300 ml-2">Installed</Badge>
+    }
+
+    return <Badge className="bg-red-200 text-red-800 hover:bg-red-300 ml-2">Not Installed</Badge>
+}
+
+const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, onBackupAction}) => {
     const [activeTab, setActiveTab] = useState<'primary' | 'replica'>('primary');
 
     return (
@@ -84,6 +87,7 @@ const BackupList: React.FC<BackupListProps> = ({
                             <TableRow>
                                 <TableHead>Backup File</TableHead>
                                 <TableHead className="text-right">Size</TableHead>
+                                <TableHead className="text-right">Install Backup</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -91,10 +95,23 @@ const BackupList: React.FC<BackupListProps> = ({
                                 <TableRow key={backup.key}>
                                     <TableCell className="font-medium">
                                         {backup.key.split('/').pop()}
-                                        <Badge variant="secondary" className="ml-2">Primary</Badge>
+                                        {renderBadge(backup)}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         {formatFileSize(backup.fileSize)}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        {
+                                            backup.installed ?
+                                                <Button className="bg-red-200 text-red-800 hover:bg-red-300" onClick={() => onBackupAction('uninstall', backup)}>
+                                                    <Trash />
+                                                    Uninstall
+                                                </Button> :
+                                                <Button className="bg-green-200 text-green-800 hover:bg-green-300" onClick={() => onBackupAction('install', backup)}>
+                                                    <Download />
+                                                    Install
+                                                </Button>
+                                        }
                                     </TableCell>
                                 </TableRow>
                             ))}

@@ -7,7 +7,7 @@ import ServersList from "@/components/ServersList.jsx";
 import ModInstall from "@/components/ModInstall";
 import {KubeApiClient, HearthHubApiClient} from "@/lib/api.js";
 import {formatBytes} from "@/lib/utils.ts";
-import BackupsList from "@/BackupsList";
+import BackupsList from "@/components/BackupsList";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
@@ -75,6 +75,9 @@ const Dashboard = () => {
                             backupKeys[file.key] = ""
                         }
 
+                        // Note: we only push .db files, .fwl files are stored and synced along with db's on the backend
+                        // however, as to not confuse users and avoid any file name issues when merging user state in cognito
+                        // we only present .db files for install to users.
                         for(const file of res.files) {
                             let ext = file.key.slice(file.key.lastIndexOf(".") + 1, file.key.length)
                             let base = file.key.slice(0, file.key.lastIndexOf("."))
@@ -84,19 +87,52 @@ const Dashboard = () => {
                                 } else {
                                     console.log(`replica: ${file.key} does not have corresponding .fwl`)
                                 }
-                            } else if(file.key.includes("_backup_auto-") && ext === "fwl") {
-                                if(backupKeys.hasOwnProperty(`${base}.db`)) {
-                                    replicas.push(file)
-                                } else {
-                                    console.log(`replica: ${file.key} does not have corresponding .db file`)
-                                }
-                            } else {
+                            } else if(ext === "db") {
                                 backups.push(file)
                             }
                         }
 
-                        setPrimaryBackups(backups)
-                        setReplicaBackups(replicas)
+
+                        // Check each backup install status from cognito, if there is a match between the s3
+                        // files and cognito then take the install status of cognito. If no match is found
+                        // the backup has never been installed on the pvc.
+                        setPrimaryBackups(backups.map(b => {
+                            for (const userBackup of user.installedBackups) {
+                                console.log(`comparing: ${userBackup.name} to ${b.key}`)
+                                if (userBackup.name === b.key) {
+                                    return {
+                                        ...b,
+                                        installing: false,
+                                        installed: userBackup.installed
+                                    }
+                                }
+                            }
+
+                            return {
+                                ...b,
+                                installing: false,
+                                installed: false
+                            }
+                        }))
+
+                        setReplicaBackups(replicas.map(b => {
+                            for (const userBackup of user.installedBackups) {
+                                console.log(`comparing replica: ${userBackup.name} to ${b.key}`)
+                                if (userBackup.name === b.key) {
+                                    return {
+                                        ...b,
+                                        installing: false,
+                                        installed: userBackup.installed
+                                    }
+                                }
+                            }
+
+                            return {
+                                ...b,
+                                installing: false,
+                                installed: false
+                            }
+                        }))
                     }).catch(err => console.error("error fetching backups: ", err))
                 ]);
 
@@ -248,9 +284,8 @@ const Dashboard = () => {
                 })
                 return
             case 'stop':
-                kubeApi.scaleServer(0).then(() => {
-                    updateServerState('terminating', server.deployment_name)
-                }).catch(err => {
+                updateServerState('terminating', server.deployment_name)
+                kubeApi.scaleServer(0).catch(err => {
                     console.error("failed to scale server: ", err)
                 })
                 return
@@ -268,6 +303,14 @@ const Dashboard = () => {
         }
     }
 
+    const handleBackupAction = (action, backup) => {
+        switch (action) {
+            case 'install':
+                return
+            case 'uninstall':
+        }
+    }
+
     const renderViews = () => {
         const serverList = <ServersList
             onAction={(server, state) => handleServerAction(server, state)}
@@ -277,7 +320,7 @@ const Dashboard = () => {
         />
         switch (activeView) {
             case "create-server":
-                return <CreateServer onServerCreate={(s) => handleCreateServer(s)} />
+                return <CreateServer onServerCreate={(s) => handleCreateServer(s)} existingWorlds={primaryBackups} />
             case "servers":
                 return serverList
             case "mods":
@@ -286,7 +329,11 @@ const Dashboard = () => {
                     handleModToggle={(id) => handleModToggle(id)}
                 />
             case "backups":
-                return <BackupsList primaryBackups={primaryBackups} replicaBackups={replicaBackups} />
+                return <BackupsList
+                    primaryBackups={primaryBackups}
+                    replicaBackups={replicaBackups}
+                    onBackupAction={(action, backup) => handleBackupAction(action, backup)}
+                />
             default:
                 return serverList
         }
