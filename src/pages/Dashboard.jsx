@@ -5,9 +5,9 @@ import Sidebar from '@/components/Sidebar'
 import CreateServer from '@/components/CreateServer'
 import ServersList from "@/components/ServersList.jsx";
 import ModInstall from "@/components/ModInstall";
-import Backups from "@/components/Backups";
 import {KubeApiClient, HearthHubApiClient} from "@/lib/api.js";
 import {formatBytes} from "@/lib/utils.ts";
+import BackupsList from "@/BackupsList";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
@@ -20,47 +20,101 @@ const Dashboard = () => {
     const [serversLoading, setServersLoading] = useState(true)
     const [servers, setServers] = useState([])
     const [mods, setMods] = useState([]);
+    const [primaryBackups, setPrimaryBackups] = useState([])
+    const [replicaBackups, setReplicaBackups] = useState([])
 
     useEffect(() => {
-       kubeApi.getServer().then(server => {
-           if(!server.hasOwnProperty('message')) {
-               setServers([...servers, server])
-           }
-       }).catch((err) => {
-           console.error('failed to load servers: ', err)
-       }).finally(() => {
-           setServersLoading(false)
-       })
+        const fetchData = async () => {
+            try {
+                const [server, mods] = await Promise.all([
+                    kubeApi.getServer()
+                        .then(server => !server.hasOwnProperty('message') ? server : null)
+                        .catch(err => {
+                            console.error('failed to load servers: ', err);
+                            return null;
+                        }),
 
-       hearthhubApi.listFiles("mods").then(res => {
-           if(res.hasOwnProperty("files")) {
-               const m = res.files.map((file, i) => {
-                   const parts = file.key.split('/');
-                   let filename = parts[parts.length - 1];
-                   filename = filename.slice(0, -4);
+                    hearthhubApi.listFiles("mods")
+                        .then(res => {
+                            if (res.hasOwnProperty("files")) {
+                                return res.files.map((file, i) => {
+                                    const parts = file.key.split('/');
+                                    let filename = parts[parts.length - 1];
+                                    filename = filename.slice(0, -4);
 
-                   const remappedMod = {
-                       id: i,
-                       name: filename,
-                       size: formatBytes(file.fileSize),
-                       default: DEFAULT_MODS.includes(filename),
-                       installed: false,
-                       installing: false,
-                   }
+                                    const remappedMod = {
+                                        id: i,
+                                        name: filename,
+                                        size: formatBytes(file.fileSize),
+                                        default: DEFAULT_MODS.includes(filename),
+                                        installed: false,
+                                        installing: false,
+                                    }
 
-                   for (const userInstalledMod of user.installedMods) {
-                       if(userInstalledMod.name.slice(0, -4) === filename) {
-                           remappedMod.installed = userInstalledMod.installed
-                       }
-                   }
+                                    for (const userInstalledMod of user.installedMods) {
+                                        if (userInstalledMod.name.slice(0, -4) === filename) {
+                                            remappedMod.installed = userInstalledMod.installed
+                                        }
+                                    }
 
-                   return remappedMod
-               })
-               setMods([...m])
-           }
-       }).catch(err => {
-           console.error("failed to list mods: ", err)
-       })
+                                    return remappedMod;
+                                });
+                            }
+                            return [];
+                        })
+                        .catch(err => {
+                            console.error("failed to list mods: ", err);
+                            return [];
+                        }),
+
+                    hearthhubApi.listFiles("backups").then(res => {
+                        const backups = []
+                        const replicas = []
+                        const backupKeys = {}
+                        for(const file of res.files) {
+                            backupKeys[file.key] = ""
+                        }
+
+                        for(const file of res.files) {
+                            let ext = file.key.slice(file.key.lastIndexOf(".") + 1, file.key.length)
+                            let base = file.key.slice(0, file.key.lastIndexOf("."))
+                            if(file.key.includes("_backup_auto-") && ext === "db") {
+                                if(backupKeys.hasOwnProperty(`${base}.fwl`)) {
+                                    replicas.push(file)
+                                } else {
+                                    console.log(`replica: ${file.key} does not have corresponding .fwl`)
+                                }
+                            } else if(file.key.includes("_backup_auto-") && ext === "fwl") {
+                                if(backupKeys.hasOwnProperty(`${base}.db`)) {
+                                    replicas.push(file)
+                                } else {
+                                    console.log(`replica: ${file.key} does not have corresponding .db file`)
+                                }
+                            } else {
+                                backups.push(file)
+                            }
+                        }
+
+                        setPrimaryBackups(backups)
+                        setReplicaBackups(replicas)
+                    }).catch(err => console.error("error fetching backups: ", err))
+                ]);
+
+                if (server) {
+                    setServers([...servers, server]);
+                }
+
+                if (mods.length > 0) {
+                    setMods([...mods]);
+                }
+            } catch (err) {
+                console.error("Error fetching data: ", err);
+            } finally {
+                setServersLoading(false);
+            }
+        };
+
+        fetchData();
     }, [])
 
     useEffect(() => {
@@ -232,7 +286,7 @@ const Dashboard = () => {
                     handleModToggle={(id) => handleModToggle(id)}
                 />
             case "backups":
-                return <Backups />
+                return <BackupsList primaryBackups={primaryBackups} replicaBackups={replicaBackups} />
             default:
                 return serverList
         }

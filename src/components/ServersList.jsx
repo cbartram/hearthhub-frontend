@@ -22,10 +22,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction }) 
 
                 <CardContent className="space-y-6">
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Server className="h-4 w-4" />
-                            <span>Connection Details</span>
-                        </div>
                         <div className="grid grid-cols-2 gap-2">
                             <Skeleton className="h-4 w-32" />
                             <Skeleton className="h-4 w-24" />
@@ -33,10 +29,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction }) 
                     </div>
 
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Users className="h-4 w-4" />
-                            <span>World Settings</span>
-                        </div>
                         <div className="grid grid-cols-2 gap-2">
                             <Skeleton className="h-4 w-28" />
                             <Skeleton className="h-4 w-36" />
@@ -46,10 +38,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction }) 
                     </div>
 
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Shield className="h-4 w-4" />
-                            <span>Game Modifiers</span>
-                        </div>
                         <div className="flex flex-wrap gap-2">
                             <Skeleton className="h-6 w-24" />
                             <Skeleton className="h-6 w-28" />
@@ -59,10 +47,6 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction }) 
                     </div>
 
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4" />
-                            <span>Backup & Save Settings</span>
-                        </div>
                         <div className="grid grid-cols-2 gap-2">
                             <Skeleton className="h-4 w-36" />
                             <Skeleton className="h-4 w-24" />
