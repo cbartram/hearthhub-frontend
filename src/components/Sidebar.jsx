@@ -2,8 +2,8 @@ import React from 'react';
 import {
     Home,
     PlusCircle,
-    HardDrive,
-    Puzzle
+    Puzzle,
+    Globe2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -25,8 +25,8 @@ const Sidebar = ({ activeView, onViewChange }) => {
             view: 'mods'
         },
         {
-            icon: <HardDrive />,
-            label: 'Backups',
+            icon: <Globe2 />,
+            label: 'Worlds',
             view: 'backups'
         }
     ];

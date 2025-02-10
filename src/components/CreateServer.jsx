@@ -144,8 +144,8 @@ const CreateServer = ({ onServerCreate, existingWorlds }) => {
                                         <SelectContent>
                                             {
                                                 existingWorlds.length === 0 ? <SelectItem value="no-world">No Existing Worlds Found</SelectItem> :
-                                                existingWorlds.map(w => (
-                                                    <SelectItem value={sanitizeWorldName(w.key)} disabled={!w.installed}>{sanitizeWorldName(w.key)}{!w.installed && " (Not Installed)"}</SelectItem>
+                                                existingWorlds.map((w, i) => (
+                                                    <SelectItem value={sanitizeWorldName(w.key) + `_${i}`} disabled={!w.installed}>{sanitizeWorldName(w.key)}{!w.installed && " (Not Installed)"}</SelectItem>
                                                 ))
                                             }
                                         </SelectContent>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {Copy, DatabaseBackup, Download, Trash} from 'lucide-react';
+import { DatabaseBackup, Download, Globe2, LoaderCircle, Trash} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -55,6 +55,32 @@ const renderBadge = (backup: Backup) => {
     return <Badge className="bg-red-200 text-red-800 hover:bg-red-300 ml-2">Not Installed</Badge>
 }
 
+const renderButtons = (backup: Backup, onBackupAction: Function) => {
+    if(backup.installing && !backup.installed) {
+        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300" disabled>
+            Installing...
+            <LoaderCircle className="ml-2 animate-spin" />
+        </Button>
+    } else if(backup.installing && backup.installed) {
+        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300" disabled>
+            Uninstalling...
+            <LoaderCircle className="ml-2 animate-spin" />
+        </Button>
+    }
+
+    if(!backup.installing && !backup.installed) {
+        return <Button className="bg-green-200 text-green-800 hover:bg-green-300" onClick={() => onBackupAction('install', backup)}>
+            <Download />
+            Install
+        </Button>
+    }
+
+    return <Button className="bg-red-200 text-red-800 hover:bg-red-300" onClick={() => onBackupAction('uninstall', backup)}>
+        <Trash />
+        Uninstall
+    </Button>
+}
+
 const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, onBackupAction}) => {
     const [activeTab, setActiveTab] = useState<'primary' | 'replica'>('primary');
 
@@ -62,20 +88,20 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
         <Card className="w-full max-w-4xl">
             <CardHeader>
                 <div className="flex justify-between items-center">
-                    <CardTitle>Valheim Backups</CardTitle>
+                    <CardTitle>Valheim Worlds</CardTitle>
                     <div>
                         <Button
                             variant={activeTab === 'primary' ? 'default' : 'outline'}
                             onClick={() => setActiveTab('primary')}
                             className="mr-2"
                         >
-                            <DatabaseBackup className="mr-2 h-4 w-4" /> Primary
+                            <Globe2 className="mr-2 h-4 w-4" /> Worlds
                         </Button>
                         <Button
                             variant={activeTab === 'replica' ? 'default' : 'outline'}
                             onClick={() => setActiveTab('replica')}
                         >
-                            <Copy className="mr-2 h-4 w-4" /> Replicas
+                            <DatabaseBackup className="mr-2 h-4 w-4" /> World Backups
                         </Button>
                     </div>
                 </div>
@@ -85,7 +111,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Backup File</TableHead>
+                                <TableHead>World File</TableHead>
                                 <TableHead className="text-right">Size</TableHead>
                                 <TableHead className="text-right">Install Backup</TableHead>
                             </TableRow>
@@ -102,15 +128,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                                     </TableCell>
                                     <TableCell className="text-right">
                                         {
-                                            backup.installed ?
-                                                <Button className="bg-red-200 text-red-800 hover:bg-red-300" onClick={() => onBackupAction('uninstall', backup)}>
-                                                    <Trash />
-                                                    Uninstall
-                                                </Button> :
-                                                <Button className="bg-green-200 text-green-800 hover:bg-green-300" onClick={() => onBackupAction('install', backup)}>
-                                                    <Download />
-                                                    Install
-                                                </Button>
+                                            renderButtons(backup, onBackupAction)
                                         }
                                     </TableCell>
                                 </TableRow>

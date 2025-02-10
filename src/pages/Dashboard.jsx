@@ -98,8 +98,8 @@ const Dashboard = () => {
                         // the backup has never been installed on the pvc.
                         setPrimaryBackups(backups.map(b => {
                             for (const userBackup of user.installedBackups) {
-                                console.log(`comparing: ${userBackup.name} to ${b.key}`)
-                                if (userBackup.name === b.key) {
+                                let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
+                                if (userBackup.name === shortName) {
                                     return {
                                         ...b,
                                         installing: false,
@@ -117,8 +117,8 @@ const Dashboard = () => {
 
                         setReplicaBackups(replicas.map(b => {
                             for (const userBackup of user.installedBackups) {
-                                console.log(`comparing replica: ${userBackup.name} to ${b.key}`)
-                                if (userBackup.name === b.key) {
+                                let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
+                                if (userBackup.name === shortName) {
                                     return {
                                         ...b,
                                         installing: false,
@@ -188,6 +188,20 @@ const Dashboard = () => {
                                 return m
                             })
                         ])
+
+                        console.log(`content op: ${content.operation}, installed = ${content.operation === "write"}`)
+                        setPrimaryBackups([
+                            ...primaryBackups.map(b => {
+                                if(b.installing) {
+                                    return {
+                                        ...b,
+                                        installing: false,
+                                        installed: content.operation === "write"
+                                    }
+                                }
+                                return b
+                            })
+                        ])
                     } else if (content.containerType === "server") {
                         updateServerState('stopped', content.containerName)
                     }
@@ -206,7 +220,7 @@ const Dashboard = () => {
                 ws.close();
             }
         };
-    }, [servers, mods]);
+    }, [servers, mods, primaryBackups]);
 
     const updateServerState = (state, containerName) => {
         setServers([
@@ -306,9 +320,30 @@ const Dashboard = () => {
     const handleBackupAction = (action, backup) => {
         switch (action) {
             case 'install':
-                return
+                setPrimaryBackups([
+                    ...primaryBackups.map(b => b.key === backup.key ? { ...b, installing: true }:b)
+                ])
+                break
             case 'uninstall':
+                setPrimaryBackups([
+                    ...primaryBackups.map(b => b.key === backup.key ? { ...b, installing: true }:b)
+                ])
+                break
+            default:
+                console.error("unknown backup action: ", action)
         }
+
+        const op = !backup.installed ? "write" : "delete"
+        kubeApi.installFile({
+            prefix: backup.key,
+            destination: "/root/.config/unity3d/IronGate/Valheim/worlds_local",
+            is_archive: false,
+            operation: op
+        }).then(res => {
+            console.log('install backup response: ', res)
+        }).catch(err => {
+            console.error("failed to install backup: ", err)
+        })
     }
 
     const renderViews = () => {
