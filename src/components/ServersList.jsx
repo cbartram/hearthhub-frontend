@@ -6,7 +6,7 @@ import {Clock, Server, Shield, Users} from "lucide-react";
 import { Skeleton } from '@/components/ui/skeleton';
 
 
-const ServersList = ({ servers, loading, onServerCreateButtonClick }) => {
+const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction }) => {
 
     const renderSkeleton = () => {
         return (
@@ -89,7 +89,7 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick }) => {
             ) : (
                 <div className="grid gap-4">
                     {loading ? renderSkeleton() : servers.map((server, i) => (
-                        <ServerDetailsCard id={`${server.deployment_name}_${i}`} serverData={server} />
+                        <ServerDetailsCard id={`${server.deployment_name}_${i}`} serverData={server} onAction={(state) => onAction(server, state)} />
                     ))}
                 </div>
             )}

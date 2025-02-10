@@ -48,9 +48,9 @@ const Dashboard = () => {
                        installing: false,
                    }
 
-                   for (const userInstalledMod in user.installedMods) {
-                       if(userInstalledMod.name === filename) {
-                           remappedMod.installed = true
+                   for (const userInstalledMod of user.installedMods) {
+                       if(userInstalledMod.name.slice(0, -4) === filename) {
+                           remappedMod.installed = userInstalledMod.installed
                        }
                    }
 
@@ -68,20 +68,16 @@ const Dashboard = () => {
         const ws = new WebSocket(`http://71.77.136.117/ws?id=${user.discordId}`);
 
         ws.addEventListener('message', (event) => {
-            console.log("Servers within websocket handler: ", servers)
-
             const message = JSON.parse(event.data)
             console.log('received ws message:', message);
             const content = JSON.parse(message.content)
 
             switch(message.type) {
                 case "PostStart":
-                    // Update the servers state to "loading"
                     updateServerState('loading', content.containerName)
                     break
                 case "ContainerReady":
                     if(content.containerType === "server") {
-                        // Update the servers state to "running"
                         updateServerState('running', content.containerName)
                     }
                     break
@@ -89,6 +85,9 @@ const Dashboard = () => {
                     if(content.containerType === "file-install") {
                         setMods([
                             ...mods.map(m => {
+                                // We don't have a way to tie the mod state in react to the k8s job
+                                // which installed the mod so clicking to install 3 mods at once when 1
+                                // websocket event comes in all 3 mods will have their state updated at once.
                                 if(m.installing) {
                                     return {
                                         ...m,
@@ -100,7 +99,6 @@ const Dashboard = () => {
                             })
                         ])
                     } else if (content.containerType === "server") {
-                        // Update the servers state to "stopped"
                         updateServerState('stopped', content.containerName)
                     }
                     break
@@ -118,7 +116,7 @@ const Dashboard = () => {
                 ws.close();
             }
         };
-    }, [servers]);
+    }, [servers, mods]);
 
     const updateServerState = (state, containerName) => {
         setServers([
@@ -163,8 +161,6 @@ const Dashboard = () => {
         })
     }
 
-    // TODO Make API request to install the mod or uninstall the mod and update state till
-    // the websocket notifies the operation completed!
     const handleModToggle = (modId) => {
         const mod = mods.filter(m => m.id === modId)[0]
         const newMods = mods.map(m =>
@@ -172,13 +168,15 @@ const Dashboard = () => {
         )
         setMods([...newMods]);
 
+        const op = !mod.installed ? "write" : "delete"
+
         // Prefix in S3 will differ between default mods and user uploaded mods
         const prefix = mod.default ? `mods/general/${mod.name}.zip` : `mods/${user.discordId}/${mod.name}.zip`
         kubeApi.installFile({
             prefix,
             destination: "/valheim/BepInEx/plugins",
             is_archive: true,
-            operation: "write"
+            operation: op
         }).then(res => {
             console.log('install mod response: ', res)
         }).catch(err => {
@@ -186,8 +184,43 @@ const Dashboard = () => {
         })
     };
 
+    const handleServerAction = (server, action) => {
+        switch(action) {
+            case 'start':
+                kubeApi.scaleServer(1).then(() => {
+                    updateServerState('scheduling', server.deployment_name)
+                }).catch(err => {
+                    console.error("failed to scale server: ", err)
+                })
+                return
+            case 'stop':
+                kubeApi.scaleServer(0).then(() => {
+                    updateServerState('terminating', server.deployment_name)
+                }).catch(err => {
+                    console.error("failed to scale server: ", err)
+                })
+                return
+            case 'delete':
+                kubeApi.deleteServer().then(res => {
+                    setServers([
+                        ...servers.filter(s => !res.resources.includes(s.deployment_name))
+                    ])
+                }).catch(err => {
+                    console.error('failed to delete server: ', err)
+                })
+                return
+            default:
+                console.error("unknown action: ", action)
+        }
+    }
+
     const renderViews = () => {
-        const serverList = <ServersList loading={serversLoading} servers={servers} onServerCreateButtonClick={() => setActiveView('create-server')} />
+        const serverList = <ServersList
+            onAction={(server, state) => handleServerAction(server, state)}
+            loading={serversLoading}
+            servers={servers}
+            onServerCreateButtonClick={() => setActiveView('create-server')}
+        />
         switch (activeView) {
             case "create-server":
                 return <CreateServer onServerCreate={(s) => handleCreateServer(s)} />

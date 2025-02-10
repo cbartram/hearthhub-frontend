@@ -55,7 +55,7 @@ const ModInstall = ({mods, handleModToggle}) => {
                                         variant="secondary"
                                         className={getBadgeClass(m)}
                                     >
-                                        {getBadgeName(m) === "Installing" ? <div className="flex item-center justify-between"><span className="px-2">Installing</span> <LoaderCircle className="animate-spin" /></div> : getBadgeName(m)}
+                                        {getBadgeName(m) === "Installing" ? <div className="flex item-center justify-between"><span className="px-2">{m.installed ? 'Uninstalling' : 'Installing'}</span> <LoaderCircle className="animate-spin" /></div> : getBadgeName(m)}
                                     </Badge>
                                     {
                                         m.default ? <Badge className="bg-green-200 my-2 text-green-800 text-md hover:bg-green-200">Default Mod</Badge> : <Badge variant="secondary" className="bg-yellow-100 my-2 text-yellow-800 text-md hover:bg-yellow-200">Custom Mod</Badge>

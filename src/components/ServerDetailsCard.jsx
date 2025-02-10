@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import {Shield, Users, Server, Clock, LoaderCircle, RotateCcw, Play, Pause, Trash} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 
-const ServerDetailsCard = ({ serverData, id }) => {
+const ServerDetailsCard = ({ serverData, id, onAction }) => {
     const { server_ip, server_port, world_details, state } = serverData;
 
     const getModifierBadgeColor = (key, value) => {
@@ -70,6 +70,14 @@ const ServerDetailsCard = ({ serverData, id }) => {
                 >
                     <span className="mx-2">Stopped</span>
                 </Badge>
+            case "terminating":
+                return <Badge
+                    variant="secondary"
+                    className="bg-red-100 text-red-800 p-3 text-md"
+                >
+                    <span className="mx-2">Shutting Down... </span>
+                    <LoaderCircle className="animate-spin" />
+                </Badge>
             default:
                 return <Badge
                     variant="secondary"
@@ -77,22 +85,6 @@ const ServerDetailsCard = ({ serverData, id }) => {
                 >
                     <span className="mx-2">Unknown</span>
                 </Badge>
-        }
-    }
-
-    const renderActionButtons = () => {
-        switch (state) {
-            case "terminated":
-            case "stopped": // -> show start button
-                return <Button className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6">
-                    <Play /> Start
-                </Button>
-            case "running": // -> show stop button
-                return
-            case "loading": // -> show disabled start button
-                return
-            default:
-                // show restart button
         }
     }
 
@@ -192,13 +184,13 @@ const ServerDetailsCard = ({ serverData, id }) => {
                             <span>Actions</span>
                         </div>
                         <div className="gap-2 flex flex-grow">
-                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6">
+                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6" onClick={() => onAction('start')}>
                                 <Play /> Start
                             </Button>
-                            <Button disabled={state !== "running"} className="bg-blue-200 text-blue-800 hover:bg-blue-300 my-2 py-6">
+                            <Button disabled={state !== "running"} className="bg-blue-200 text-blue-800 hover:bg-blue-300 my-2 py-6" onClick={() => onAction('stop')}>
                                 <Pause /> Stop
                             </Button>
-                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-red-200 text-red-800 hover:bg-red-300 my-2 py-6">
+                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-red-200 text-red-800 hover:bg-red-300 my-2 py-6" onClick={() => onAction('delete')}>
                                 <Trash /> Delete
                             </Button>
                         </div>
