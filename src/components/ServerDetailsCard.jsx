@@ -1,11 +1,25 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {Shield, Users, Server, Clock, LoaderCircle, RotateCcw, Play, Pause, Trash, Pencil, Edit} from 'lucide-react';
+import {
+    Shield,
+    Server,
+    Clock,
+    LoaderCircle,
+    RotateCcw,
+    Play,
+    Pause,
+    Trash,
+    Edit,
+    Globe2,
+} from 'lucide-react';
 import {Button} from "@/components/ui/button";
+import DangerDialogue from "@/components/DangerDialogue";
 
 const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
     const { server_ip, server_port, world_details, state } = serverData;
+
+    const [showDialog, setShowDialog] = useState(false)
 
     const getModifierBadgeColor = (key, value) => {
         if(key === "raids") {
@@ -89,117 +103,126 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
     }
 
     return (
-        <Card className="w-full max-w-2xl" key={id}>
-            <CardHeader>
-                <div className="flex justify-end items-center">
-                    <CardTitle className="flex-grow text-2xl font-bold">
-                        {world_details.name}
-                    </CardTitle>
-                    <Button className="mr-2 py-6 hover:border-1 hover:border-slate-900" disabled={state !== "stopped" && state !== "terminated"} onClick={() => onEdit(serverData)}><Edit /></Button>
-                    {getBadge(state)}
-                </div>
-                <hr />
-            </CardHeader>
+        <>
+            <Card className="w-full max-w-2xl" key={id}>
+                <CardHeader>
+                    <div className="flex justify-end items-center">
+                        <CardTitle className="flex-grow text-2xl font-bold">
+                            {world_details.name}
+                        </CardTitle>
+                        <Button className="mr-2 py-6 hover:border-1 hover:border-slate-900" disabled={state !== "stopped" && state !== "terminated"} onClick={() => onEdit(serverData)}><Edit /></Button>
+                        {getBadge(state)}
+                    </div>
+                    <hr />
+                </CardHeader>
 
-            <CardContent className="space-y-6">
-                {/* Connection Details */}
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Server className="h-4 w-4" />
-                        <span>Connection Details</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="text-sm">
-                            <span className="font-medium">IP:</span> {server_ip}
-                        </div>
-                        <div className="text-sm">
-                            <span className="font-medium">Port:</span> {server_port}
-                        </div>
-                    </div>
-                </div>
-
-                {/* World Settings */}
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Users className="h-4 w-4" />
-                        <span>World Settings</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="text-sm">
-                            <span className="font-medium">World:</span> {world_details.world}
-                        </div>
-                        <div className="text-sm">
-                            <span className="font-medium">Password Protected:</span> {world_details.password ? 'Yes' : 'No'}
-                        </div>
-                        <div className="text-sm">
-                            <span className="font-medium">Crossplay:</span> {world_details.enable_crossplay ? 'Enabled' : 'Disabled'}
-                        </div>
-                        <div className="text-sm">
-                            <span className="font-medium">Public:</span> {world_details.public ? 'Yes' : 'No'}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Game Modifiers */}
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Shield className="h-4 w-4" />
-                        <span>Game Modifiers</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {world_details.modifiers.map(({ key, value }, i) => (
-                            <Badge
-                                key={i}
-                                className={getModifierBadgeColor(key, value)}
-                            >
-                                {key}: {value}
-                            </Badge>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Backup Settings */}
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        <span>Backup & Save Settings</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="text-sm">
-                            <span className="font-medium">Save Interval:</span> {world_details.save_interval_seconds / 60} minutes
-                        </div>
-                        <div className="text-sm">
-                            <span className="font-medium">Backup Count:</span> {world_details.backup_count}
-                        </div>
-                        <div className="text-sm">
-                            <span className="font-medium">Initial Backup:</span> {world_details.initial_backup_seconds / 3600} hours
-                        </div>
-                        <div className="text-sm">
-                            <span className="font-medium">Backup Interval:</span> {world_details.backup_interval_seconds / 3600} hours
-                        </div>
-                    </div>
-
-
+                <CardContent className="space-y-6">
+                    {/* Connection Details */}
                     <div className="space-y-2">
-                        <div className="flex items-center ap-2 text-sm text-muted-foreground">
-                            <RotateCcw className="h-4 w-4" />
-                            <span>Actions</span>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Server className="h-4 w-4" />
+                            <span>Connection Details</span>
                         </div>
-                        <div className="gap-2 flex flex-grow">
-                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-green-200" onClick={() => onAction('start')}>
-                                <Play /> Start
-                            </Button>
-                            <Button disabled={state !== "running"} className="bg-blue-200 text-blue-800 hover:bg-blue-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-blue-200" onClick={() => onAction('stop')}>
-                                <Pause /> Stop
-                            </Button>
-                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-red-200 text-red-800 hover:bg-red-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-red-200" onClick={() => onAction('delete')}>
-                                <Trash /> Delete
-                            </Button>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="text-sm">
+                                <span className="font-medium">IP:</span> {server_ip}
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">Port:</span> {server_port}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+
+                    {/* World Settings */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Globe2 className="h-4 w-4" />
+                            <span>World Settings</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="text-sm">
+                                <span className="font-medium">World:</span> {world_details.world}
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">Password Protected:</span> {world_details.password ? 'Yes' : 'No'}
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">Crossplay:</span> {world_details.enable_crossplay ? 'Enabled' : 'Disabled'}
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">Public:</span> {world_details.public ? 'Yes' : 'No'}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Game Modifiers */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Shield className="h-4 w-4" />
+                            <span>Game Modifiers</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {world_details.modifiers.map(({ key, value }, i) => (
+                                <Badge
+                                    key={i}
+                                    className={getModifierBadgeColor(key, value)}
+                                >
+                                    {key}: {value}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Backup Settings */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            <span>Backup & Save Settings</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="text-sm">
+                                <span className="font-medium">Save Interval:</span> {world_details.save_interval_seconds / 60} minutes
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">Backup Count:</span> {world_details.backup_count}
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">Initial Backup:</span> {world_details.initial_backup_seconds / 3600} hours
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">Backup Interval:</span> {world_details.backup_interval_seconds / 3600} hours
+                            </div>
+                        </div>
+
+
+                        <div className="space-y-2">
+                            <div className="flex items-center ap-2 text-sm text-muted-foreground">
+                                <RotateCcw className="h-4 w-4" />
+                                <span>Actions</span>
+                            </div>
+                            <div className="gap-2 flex flex-grow">
+                                <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-green-200" onClick={() => onAction('start')}>
+                                    <Play /> Start
+                                </Button>
+                                <Button disabled={state !== "running"} className="bg-blue-200 text-blue-800 hover:bg-blue-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-blue-200" onClick={() => onAction('stop')}>
+                                    <Pause /> Stop
+                                </Button>
+                                <Button disabled={state !== "terminated" && state !== "stopped"}
+                                        className="bg-red-200 text-red-800 hover:bg-red-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-red-200"
+                                        onClick={() => setShowDialog(true)}>
+                                    <Trash /> Delete
+                                </Button>
+                                <DangerDialogue
+                                    showDialog={showDialog}
+                                    setShowDialog={setShowDialog}
+                                    onDestructiveAction={() => onAction('delete')}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </>
     );
 };
 

@@ -12,6 +12,9 @@ import {
     TableRow
 } from '@/components/ui/table';
 
+// @ts-ignore
+import DangerDialogue from '@/components/DangerDialogue.jsx'
+
 type Backup = {
     key: string;
     fileSize: number;

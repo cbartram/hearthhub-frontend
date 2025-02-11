@@ -55,7 +55,7 @@ const ModInstall = ({mods, handleModToggle}) => {
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500"/>
                         <Input placeholder="Search mods..." className="pl-8" onChange={(e) => onSearch(e.target.value)} />
                     </div>
-                    <div className="space-y-2 max-h-96 overflow-y-scroll no-scrollbar">
+                    <div className="space-y-2 max-h-[705px] overflow-y-scroll no-scrollbar">
                         {shownMods.map(m => (
                             <div key={`${m.name}_${m.id}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <div>

@@ -5,11 +5,10 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
 
 
-const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, onEdit }) => {
-
-    const renderSkeleton = () => {
-        return (
-            <Card className="w-full max-w-2xl">
+export const renderSkeleton = () => {
+    return (
+        <div>
+            <Card className="w-full max-w-2xl m-6">
                 <CardHeader>
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-xl font-bold">
@@ -55,10 +54,12 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, on
                     </div>
                 </CardContent>
             </Card>
-        );
-    };
+        </div>
+    );
+};
 
 
+const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, onEdit }) => {
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-6">Your Valheim Servers</h2>
