@@ -133,6 +133,13 @@ class KubeApiClient extends ApiClient {
         });
     }
 
+    async patchServer(serverConfig) {
+        return this.request('/api/v1/server/update', {
+            method: 'PUT',
+            body: JSON.stringify(serverConfig)
+        })
+    }
+
     async deleteServer() {
         return this.request('/api/v1/server/delete', {
             method: 'DELETE'

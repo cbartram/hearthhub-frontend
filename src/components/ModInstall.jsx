@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -7,6 +7,16 @@ import {Badge} from "@/components/ui/badge";
 
 
 const ModInstall = ({mods, handleModToggle}) => {
+    const [shownMods, setShownMods] = useState(mods)
+
+    const onSearch = (val) => {
+        if(val.length === 0) {
+            setShownMods(mods)
+            return
+        }
+
+        setShownMods(mods.filter(m => m.name.toLowerCase().includes(val.toLowerCase())))
+    }
 
     const getBadgeClass = (mod) => {
         if(mod.installing) {
@@ -42,10 +52,10 @@ const ModInstall = ({mods, handleModToggle}) => {
             <CardContent>
                 <div className="relative mb-4">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500"/>
-                    <Input placeholder="Search mods..." className="pl-8"/>
+                    <Input placeholder="Search mods..." className="pl-8" onChange={(e) => onSearch(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                    {mods.map(m => (
+                    {shownMods.map(m => (
                         <div key={`${m.name}_${m.id}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                             <div>
                                 {/* TODO it would be nice to have images for the mods in the future */}
@@ -58,7 +68,7 @@ const ModInstall = ({mods, handleModToggle}) => {
                                         {getBadgeName(m) === "Installing" ? <div className="flex item-center justify-between"><span className="px-2">{m.installed ? 'Uninstalling' : 'Installing'}</span> <LoaderCircle className="animate-spin" /></div> : getBadgeName(m)}
                                     </Badge>
                                     {
-                                        m.default ? <Badge className="bg-green-200 my-2 text-green-800 text-md hover:bg-green-200">Default Mod</Badge> : <Badge variant="secondary" className="bg-yellow-100 my-2 text-yellow-800 text-md hover:bg-yellow-200">Custom Mod</Badge>
+                                        m.default ? <Badge className="bg-green-100 my-2 text-green-800 text-md hover:bg-green-200">Default Mod</Badge> : <Badge variant="secondary" className="bg-yellow-100 my-2 text-yellow-800 text-md hover:bg-yellow-200">Custom Mod</Badge>
                                     }
                                 </div>
                                 <p className="text-sm text-gray-500">

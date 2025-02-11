@@ -138,7 +138,7 @@ const Dashboard = () => {
                 ]);
 
                 if (server) {
-                    setServers([...servers, server]);
+                    setServers([server]);
                 }
 
                 if (mods.length > 0) {
@@ -200,6 +200,18 @@ const Dashboard = () => {
                                     }
                                 }
                                 return b
+                            })
+                        ])
+
+                        setReplicaBackups([
+                            ...replicaBackups.map(r => {
+                                if(r.installing) {
+                                    return {
+                                        ...r,
+                                        installing: false
+                                    }
+                                }
+                                return r
                             })
                         ])
                     } else if (content.containerType === "server") {
@@ -280,10 +292,24 @@ const Dashboard = () => {
             "backup_interval_seconds": server.backupIntervalSeconds
         };
 
-        // TODO Create API route to handle patching an existing deployment with new container runtime args
-        // kubeApi.createServer(body).then((server) => setServers([...servers,  {...server, state: 'scheduling'}])).catch(err => {
-        //     console.error("api request to create server failed: ", err)
-        // })
+        setServersLoading(true)
+        kubeApi.patchServer(body).then((server) => {
+            setServers([
+                ...servers.map(s => {
+                    if(s.deployment_name === server.deployment_name) {
+                        return {
+                            ...s,
+                            ...server
+                        }
+                    }
+                    return s
+                })
+            ])
+        }).catch(err => {
+            console.error("api request to create server failed: ", err)
+        }).finally(() => {
+            setServersLoading(false)
+        })
     }
 
     const handleCreateServer = (server) => {
@@ -301,8 +327,38 @@ const Dashboard = () => {
             "backup_interval_seconds": server.backupIntervalSeconds
         };
 
+        setServersLoading(true)
         kubeApi.createServer(body).then((server) => setServers([...servers,  {...server, state: 'scheduling'}])).catch(err => {
             console.error("api request to create server failed: ", err)
+        }).finally(() => {
+            setServersLoading(false)
+        })
+    }
+
+    const handleRestoreBackup = (server, backup) => {
+        // Important: This takes the world_backup_auto-{date}.db file from S3, and overwrites the
+        // world.db file on the pvc. The next time the server starts for this world it will use the backed up world.
+        // It will no longer be possible to retrieve the original world.db file.
+        setReplicaBackups([
+            ...replicaBackups.map(r => {
+                if(r.key === backup.key) {
+                    return {
+                        ...r,
+                        installing: true
+                    }
+                }
+                return r
+            })
+        ])
+        kubeApi.installFile({
+            archive: false,
+            prefix: backup.key,
+            destination: `/root/.config/unity3d/IronGate/Valheim/worlds_local/${server.world_details.world}.db`,
+            operation: "copy"
+        }).then(res => {
+            console.log('restore backup res: ', res)
+        }).catch(err => {
+            console.error('failed to restore backup: ', err)
         })
     }
 
@@ -427,6 +483,8 @@ const Dashboard = () => {
                 return <BackupsList
                     primaryBackups={primaryBackups}
                     replicaBackups={replicaBackups}
+                    servers={servers}
+                    onBackupRestore={(server, backup) => handleRestoreBackup(server, backup)}
                     onBackupAction={(action, backup) => handleBackupAction(action, backup)}
                 />
             default:

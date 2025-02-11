@@ -155,7 +155,7 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues }) => {
                                             {
                                                 existingWorlds.length === 0 ? <SelectItem value="no-world">No Existing Worlds Found</SelectItem> :
                                                 existingWorlds.map((w, i) => (
-                                                    <SelectItem value={sanitizeWorldName(w.key) + `_${i}`} disabled={!w.installed}>{sanitizeWorldName(w.key)}{!w.installed && " (Not Installed)"}</SelectItem>
+                                                    <SelectItem value={sanitizeWorldName(w.key)} key={`${sanitizeWorldName(w.key)}_${i}`} disabled={!w.installed}>{sanitizeWorldName(w.key)}{!w.installed && " (Not Installed)"}</SelectItem>
                                                 ))
                                             }
                                         </SelectContent>
@@ -247,12 +247,12 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues }) => {
                                             <SelectValue placeholder="Select Resources" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="muchless">Much Less</SelectItem>
-                                            <SelectItem value="less">Less</SelectItem>
-                                            <SelectItem value="standard">Standard</SelectItem>
-                                            <SelectItem value="more">More</SelectItem>
-                                            <SelectItem value="muchmore">Much More</SelectItem>
-                                            <SelectItem value="most">Most</SelectItem>
+                                            <SelectItem value="muchless">Much Less (0.25x)</SelectItem>
+                                            <SelectItem value="less">Less (0.5x)</SelectItem>
+                                            <SelectItem value="standard">Standard (1x)</SelectItem>
+                                            <SelectItem value="more">More (1.5x)</SelectItem>
+                                            <SelectItem value="muchmore">Much More (2x)</SelectItem>
+                                            <SelectItem value="most">Most (3x)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <Label>Raids</Label>
