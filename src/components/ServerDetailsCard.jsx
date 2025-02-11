@@ -92,7 +92,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
         <Card className="w-full max-w-2xl" key={id}>
             <CardHeader>
                 <div className="flex justify-end items-center">
-                    <CardTitle className="flex-grow text-xl font-bold">
+                    <CardTitle className="flex-grow text-2xl font-bold">
                         {world_details.name}
                     </CardTitle>
                     <Button className="mr-2 py-6" disabled={state !== "stopped" && state !== "terminated"} onClick={() => onEdit(serverData)}><Edit /></Button>

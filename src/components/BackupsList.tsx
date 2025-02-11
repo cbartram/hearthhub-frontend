@@ -100,13 +100,13 @@ const renderButtons = (backup: Backup, onBackupAction: Function) => {
     }
 
     if(!backup.installing && !backup.installed) {
-        return <Button className="bg-green-200 text-green-800 hover:bg-green-300" onClick={() => onBackupAction('install', backup)}>
+        return <Button className="bg-green-200 text-green-800 hover:bg-green-300 hover:border-0 hover:outline-none" onClick={() => onBackupAction('install', backup)}>
             <Download />
             Install
         </Button>
     }
 
-    return <Button className="bg-red-200 text-red-800 hover:bg-red-300" onClick={() => onBackupAction('uninstall', backup)}>
+    return <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-0 hover:outline-none" onClick={() => onBackupAction('uninstall', backup)}>
         <Trash />
         Uninstall
     </Button>
@@ -133,12 +133,12 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
 
         if(filteredServers.length > 0) {
             const server = filteredServers[0]
-            return <Button className="bg-green-100 text-green-800 hover:bg-green-200 text-md" onClick={() => onBackupRestore(server, backup)}>Restore Backup</Button>
+            return <Button className="bg-green-100 text-green-800 hover:bg-green-200 text-md hover:border-0 hover:outline-none" onClick={() => onBackupRestore(server, backup)}>Restore Backup</Button>
         } else {
             console.error(`no server could be found matching name: ${backupName}`)
         }
 
-        return <Button disabled className="bg-gray-300 text-gray-900 hover:bg-gray-400 text-md">No Server</Button>
+        return <Button disabled className="bg-gray-300 text-gray-900 hover:bg-gray-400 hover:border-none hover:outline-none text-md">No Server</Button>
     }
 
     const renderCurrentWorld = (backup: Backup) => {
@@ -163,21 +163,22 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
     }
 
     return (
-        <Card className="w-full max-w-4xl">
+        <Card className="w-full max-w-4xl m-6">
             <CardHeader>
                 <div className="flex justify-between items-center">
-                    <CardTitle>Valheim Worlds</CardTitle>
+                    <CardTitle className="text-2xl">Valheim Worlds</CardTitle>
                     <div>
                         <Button
                             variant={activeTab === 'primary' ? 'default' : 'outline'}
                             onClick={() => setActiveTab('primary')}
-                            className="mr-2"
+                            className="mr-2 border-0 focus:outline-none focus:border-none"
                         >
                             <Globe2 className="mr-2 h-4 w-4" /> Worlds
                         </Button>
                         <Button
                             variant={activeTab === 'replica' ? 'default' : 'outline'}
                             onClick={() => setActiveTab('replica')}
+                            className="border-0 focus:outline-none focus:border-none"
                         >
                             <DatabaseBackup className="mr-2 h-4 w-4" /> World Backups
                         </Button>

@@ -44,47 +44,49 @@ const ModInstall = ({mods, handleModToggle}) => {
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Mod Manager</CardTitle>
-                <CardDescription>Browse and manage your Valheim mods</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="relative mb-4">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500"/>
-                    <Input placeholder="Search mods..." className="pl-8" onChange={(e) => onSearch(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                    {shownMods.map(m => (
-                        <div key={`${m.name}_${m.id}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div>
-                                {/* TODO it would be nice to have images for the mods in the future */}
-                                <h3 className="text-lg">{m.name}</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    <Badge
-                                        variant="secondary"
-                                        className={getBadgeClass(m)}
-                                    >
-                                        {getBadgeName(m) === "Installing" ? <div className="flex item-center justify-between"><span className="px-2">{m.installed ? 'Uninstalling' : 'Installing'}</span> <LoaderCircle className="animate-spin" /></div> : getBadgeName(m)}
-                                    </Badge>
-                                    {
-                                        m.default ? <Badge className="bg-green-100 my-2 text-green-800 text-md hover:bg-green-200">Default Mod</Badge> : <Badge variant="secondary" className="bg-yellow-100 my-2 text-yellow-800 text-md hover:bg-yellow-200">Custom Mod</Badge>
-                                    }
+        <div className="w-full max-w-2xl mx-auto mt-8">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-2xl">Mod Manager</CardTitle>
+                    <CardDescription>Browse and manage your Valheim mods</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="relative mb-4">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500"/>
+                        <Input placeholder="Search mods..." className="pl-8" onChange={(e) => onSearch(e.target.value)} />
+                    </div>
+                    <div className="space-y-2 max-h-96 overflow-y-scroll no-scrollbar">
+                        {shownMods.map(m => (
+                            <div key={`${m.name}_${m.id}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    {/* TODO it would be nice to have images for the mods in the future */}
+                                    <h3 className="text-lg">{m.name}</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        <Badge
+                                            variant="secondary"
+                                            className={getBadgeClass(m)}
+                                        >
+                                            {getBadgeName(m) === "Installing" ? <div className="flex item-center justify-between"><span className="px-2">{m.installed ? 'Uninstalling' : 'Installing'}</span> <LoaderCircle className="animate-spin" /></div> : getBadgeName(m)}
+                                        </Badge>
+                                        {
+                                            m.default ? <Badge className="bg-green-100 my-2 text-green-800 text-md hover:bg-green-200">Default Mod</Badge> : <Badge variant="secondary" className="bg-yellow-100 my-2 text-yellow-800 text-md hover:bg-yellow-200">Custom Mod</Badge>
+                                        }
+                                    </div>
+                                    <p className="text-sm text-gray-500">
+                                        <Download className="inline h-4 w-4 mr-1"/>
+                                        {m.size}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-gray-500">
-                                    <Download className="inline h-4 w-4 mr-1"/>
-                                    {m.size}
-                                </p>
+                                <Switch
+                                    checked={m.installed}
+                                    onCheckedChange={() => handleModToggle(m.id)}
+                                />
                             </div>
-                            <Switch
-                                checked={m.installed}
-                                onCheckedChange={() => handleModToggle(m.id)}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     )
 }
 

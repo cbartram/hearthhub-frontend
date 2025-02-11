@@ -562,24 +562,22 @@ const Dashboard = () => {
     }
 
     return (
-        <div>
-            <Navbar onLogout={logout} userId={user.discordId} avatarId={user.avatarId}/>
-            <div className="flex h-screen">
-                <Sidebar activeView={activeView} onViewChange={(v) => setActiveView(v)} />
-                <div className="flex-1 p-6 min-w-24">
-                    {
-                        errorDialogue.visible && (
-                            <Alert variant="destructive">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>{errorDialogue.title}</AlertTitle>
-                                <AlertDescription>
-                                    {errorDialogue.message}
-                                </AlertDescription>
-                            </Alert>
-                        )
-                    }
-                    {renderViews()}
-                </div>
+        <div className="flex h-screen">
+            <Sidebar activeView={activeView} onViewChange={(v) => setActiveView(v)} />
+            <div className="flex-1 min-w-24">
+                <Navbar onLogout={logout} userId={user.discordId} avatarId={user.avatarId}/>
+                {
+                    errorDialogue.visible && (
+                        <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>{errorDialogue.title}</AlertTitle>
+                            <AlertDescription>
+                                {errorDialogue.message}
+                            </AlertDescription>
+                        </Alert>
+                    )
+                }
+                {renderViews()}
             </div>
         </div>
     );
