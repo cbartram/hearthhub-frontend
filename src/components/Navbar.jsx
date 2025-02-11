@@ -16,7 +16,7 @@ const Navbar = ({ onLogout, userId, avatarId }) => (
                 <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center">
                     <img alt="user profile avatar" src={`https://cdn.discordapp.com/avatars/${userId}/${avatarId}?size=56`} className="w-10 h-10 rounded-full border-2 border-gray-800" />
                 </div>
-                <Button className="text-white hover:text-slate-200" onClick={onLogout}>
+                <Button className="text-white hover:text-slate-200 hover:border-1 hover:border-slate-900" onClick={onLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                 </Button>

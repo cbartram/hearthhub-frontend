@@ -83,7 +83,7 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues }) => {
 
     return (
         <div className="p-0">
-            <Card className="w-full max-w-2xl mx-auto mt-8">
+            <Card className="w-full max-w-2xl m-6">
                 <CardHeader>
                     <CardTitle>Configure your Valheim Server</CardTitle>
                     <CardDescription>Configure your dedicated Valheim server settings</CardDescription>

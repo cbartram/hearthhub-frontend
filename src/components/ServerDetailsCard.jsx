@@ -42,7 +42,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
             case "scheduling":
                 return <Badge
                     variant="secondary"
-                    className="bg-yellow-100 text-yellow-800 p-3 text-md"
+                    className="bg-yellow-100 text-yellow-800 p-3 text-md hover:bg-yellow-200"
                 >
                     <span className="mx-2">Scheduling Server...</span>
                     <LoaderCircle className="animate-spin" />
@@ -50,7 +50,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
             case "loading":
                 return  <Badge
                     variant="secondary"
-                    className="bg-blue-100 text-blue-800 p-3 text-md"
+                    className="bg-blue-100 text-blue-800 p-3 text-md hover:bg-blue-200"
                 >
                     <span className="mx-2">Starting Up...</span>
                     <LoaderCircle className="animate-spin" />
@@ -58,7 +58,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
             case "running":
                 return <Badge
                     variant="secondary"
-                    className="bg-green-100 text-green-800 p-3 text-md"
+                    className="bg-green-100 text-green-800 p-3 text-md hover:bg-green-200"
                 >
                     <span className="mx-2">Running</span>
                 </Badge>
@@ -66,14 +66,14 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
             case "terminated":
                 return <Badge
                     variant="secondary"
-                    className="bg-red-100 text-red-800 p-3 text-md"
+                    className="bg-red-100 text-red-800 p-3 text-md hover:bg-red-200"
                 >
                     <span className="mx-2">Stopped</span>
                 </Badge>
             case "terminating":
                 return <Badge
                     variant="secondary"
-                    className="bg-red-100 text-red-800 p-3 text-md"
+                    className="bg-red-100 text-red-800 p-3 text-md hover:bg-red-200"
                 >
                     <span className="mx-2">Shutting Down... </span>
                     <LoaderCircle className="animate-spin" />
@@ -81,7 +81,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
             default:
                 return <Badge
                     variant="secondary"
-                    className="bg-gray-200 text-gray-800 p-3 text-md"
+                    className="bg-gray-200 text-gray-800 p-3 text-md hover:bg-gray-300"
                 >
                     <span className="mx-2">Unknown</span>
                 </Badge>
@@ -95,7 +95,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                     <CardTitle className="flex-grow text-2xl font-bold">
                         {world_details.name}
                     </CardTitle>
-                    <Button className="mr-2 py-6" disabled={state !== "stopped" && state !== "terminated"} onClick={() => onEdit(serverData)}><Edit /></Button>
+                    <Button className="mr-2 py-6 hover:border-1 hover:border-slate-900" disabled={state !== "stopped" && state !== "terminated"} onClick={() => onEdit(serverData)}><Edit /></Button>
                     {getBadge(state)}
                 </div>
                 <hr />
@@ -186,13 +186,13 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                             <span>Actions</span>
                         </div>
                         <div className="gap-2 flex flex-grow">
-                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6" onClick={() => onAction('start')}>
+                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-green-200 text-green-800 hover:bg-green-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-green-200" onClick={() => onAction('start')}>
                                 <Play /> Start
                             </Button>
-                            <Button disabled={state !== "running"} className="bg-blue-200 text-blue-800 hover:bg-blue-300 my-2 py-6" onClick={() => onAction('stop')}>
+                            <Button disabled={state !== "running"} className="bg-blue-200 text-blue-800 hover:bg-blue-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-blue-200" onClick={() => onAction('stop')}>
                                 <Pause /> Stop
                             </Button>
-                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-red-200 text-red-800 hover:bg-red-300 my-2 py-6" onClick={() => onAction('delete')}>
+                            <Button disabled={state !== "terminated" && state !== "stopped"} className="bg-red-200 text-red-800 hover:bg-red-300 my-2 py-6 hover:outline-none hover:border-1 hover:border-red-200" onClick={() => onAction('delete')}>
                                 <Trash /> Delete
                             </Button>
                         </div>

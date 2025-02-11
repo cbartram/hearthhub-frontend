@@ -44,7 +44,7 @@ const ModInstall = ({mods, handleModToggle}) => {
     }
 
     return (
-        <div className="w-full max-w-2xl mx-auto mt-8">
+        <div className="w-full max-w-2xl m-6">
             <Card>
                 <CardHeader>
                     <CardTitle className="text-2xl">Mod Manager</CardTitle>

@@ -88,25 +88,25 @@ const renderBadge = (backup: Backup) => {
 
 const renderButtons = (backup: Backup, onBackupAction: Function) => {
     if(backup.installing && !backup.installed) {
-        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300" disabled>
+        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
             Installing...
             <LoaderCircle className="ml-2 animate-spin" />
         </Button>
     } else if(backup.installing && backup.installed) {
-        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300" disabled>
+        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
             Uninstalling...
             <LoaderCircle className="ml-2 animate-spin" />
         </Button>
     }
 
     if(!backup.installing && !backup.installed) {
-        return <Button className="bg-green-200 text-green-800 hover:bg-green-300 hover:border-0 hover:outline-none" onClick={() => onBackupAction('install', backup)}>
+        return <Button className="bg-green-200 text-green-800 hover:bg-green-300 hover:border-green-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('install', backup)}>
             <Download />
             Install
         </Button>
     }
 
-    return <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-0 hover:outline-none" onClick={() => onBackupAction('uninstall', backup)}>
+    return <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('uninstall', backup)}>
         <Trash />
         Uninstall
     </Button>
@@ -133,12 +133,10 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
 
         if(filteredServers.length > 0) {
             const server = filteredServers[0]
-            return <Button className="bg-green-100 text-green-800 hover:bg-green-200 text-md hover:border-0 hover:outline-none" onClick={() => onBackupRestore(server, backup)}>Restore Backup</Button>
-        } else {
-            console.error(`no server could be found matching name: ${backupName}`)
+            return <Button className="bg-green-100 text-green-800 hover:bg-green-200 text-md hover:border-1 hover:border-green-100 hover:outline-none" onClick={() => onBackupRestore(server, backup)}>Restore Backup</Button>
         }
 
-        return <Button disabled className="bg-gray-300 text-gray-900 hover:bg-gray-400 hover:border-none hover:outline-none text-md">No Server</Button>
+        return <Button disabled className="bg-gray-300 text-gray-900 hover:bg-gray-400 hover:border-1 hover:border-gray-400 hover:outline-none text-md">No Server</Button>
     }
 
     const renderCurrentWorld = (backup: Backup) => {

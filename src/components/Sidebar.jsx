@@ -33,7 +33,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
     ];
 
     return (
-        <div className="w-80 bg-gray-200 text-secondary-foreground border-r p-4 h-screen flex flex-col">
+        <div className="w-80 bg-gray-300 text-secondary-foreground border-r p-4 h-screen flex flex-col drop-shadow-md border-0">
             <div className="flex items-center mb-8">
         <span className="w-24 h-24 rounded-full">
             <img src={HearthHubLogo} alt="hearthub-logo" width={100} height={100} />
@@ -45,7 +45,7 @@ const Sidebar = ({ activeView, onViewChange }) => {
                     <Button
                         key={item.view}
                         variant={activeView === item.view ? "default" : "ghost"}
-                        className={activeView === item.view ? "w-full justify-start bg-slate-400 text-gray-800 hover:bg-slate-600 border-0 focus:outline-none focus:border-none" : "w-full justify-start bg-gray-200"}
+                        className={activeView === item.view ? "w-full justify-start bg-primary text-white hover:bg-primary border-0 focus:outline-none focus:border-none" : "w-full justify-start bg-gray-300 hover:border-1 hover:border-gray-200"}
                         onClick={() => onViewChange(item.view)}
                     >
                         {item.icon}
