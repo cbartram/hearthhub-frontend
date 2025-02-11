@@ -8,6 +8,8 @@ import ModInstall from "@/components/ModInstall";
 import {KubeApiClient, HearthHubApiClient} from "@/lib/api.js";
 import {formatBytes} from "@/lib/utils.ts";
 import BackupsList from "@/components/BackupsList";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {AlertCircle} from "lucide-react";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
@@ -23,6 +25,11 @@ const Dashboard = () => {
     const [primaryBackups, setPrimaryBackups] = useState([])
     const [replicaBackups, setReplicaBackups] = useState([])
     const [editedServer, setEditedServer] = useState({})
+    const [errorDialogue, setErrorDialogue] = useState({
+        visible: false,
+        title: '',
+        message: '',
+    })
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,7 +39,12 @@ const Dashboard = () => {
                         .then(server => !server.hasOwnProperty('message') ? server : null)
                         .catch(err => {
                             console.error('failed to load servers: ', err);
-                            return null;
+                            setErrorDialogue({
+                                visible: true,
+                                title: 'Error retrieving servers',
+                                message: 'Failed to retrieve servers. Details: ' + err.message
+                            })
+                            return []
                         }),
 
                     hearthhubApi.listFiles("mods")
@@ -65,6 +77,11 @@ const Dashboard = () => {
                         })
                         .catch(err => {
                             console.error("failed to list mods: ", err);
+                            setErrorDialogue({
+                                visible: true,
+                                title: 'Error retrieving Mods',
+                                message: 'Failed to retrieve mods. Details: ' + err.message
+                            })
                             return [];
                         }),
 
@@ -134,7 +151,14 @@ const Dashboard = () => {
                                 installed: false
                             }
                         }))
-                    }).catch(err => console.error("error fetching backups: ", err))
+                    }).catch(err => {
+                        console.error("error fetching backups: ", err)
+                        setErrorDialogue({
+                            visible: true,
+                            title: 'Error retrieving backups',
+                            message: 'Failed to retrieve backup files. Details: ' + err.message
+                        })
+                    })
                 ]);
 
                 if (server) {
@@ -146,6 +170,11 @@ const Dashboard = () => {
                 }
             } catch (err) {
                 console.error("Error fetching data: ", err);
+                setErrorDialogue({
+                    visible: true,
+                    title: 'Error fetching data',
+                    message: 'Failed to retrieve general data. Details: ' + err.message
+                })
             } finally {
                 setServersLoading(false);
             }
@@ -225,6 +254,11 @@ const Dashboard = () => {
 
         ws.addEventListener('error', (event) => {
             console.error('websocket error:', event);
+            setErrorDialogue({
+                visible: true,
+                title: 'Error receiving event',
+                message: `Failed to receive websocket event. Details: ${event}`
+            })
         });
 
         return () => {
@@ -306,7 +340,12 @@ const Dashboard = () => {
                 })
             ])
         }).catch(err => {
-            console.error("api request to create server failed: ", err)
+            console.error("api request to edit server failed: ", err)
+            setErrorDialogue({
+                visible: true,
+                title: 'Error editing server',
+                message: 'Failed to edit server. Details: ' + err.message
+            })
         }).finally(() => {
             setServersLoading(false)
         })
@@ -330,6 +369,11 @@ const Dashboard = () => {
         setServersLoading(true)
         kubeApi.createServer(body).then((server) => setServers([...servers,  {...server, state: 'scheduling'}])).catch(err => {
             console.error("api request to create server failed: ", err)
+            setErrorDialogue({
+                visible: true,
+                title: 'Error creating server',
+                message: 'Failed to create server. Details: ' + err.message
+            })
         }).finally(() => {
             setServersLoading(false)
         })
@@ -359,6 +403,11 @@ const Dashboard = () => {
             console.log('restore backup res: ', res)
         }).catch(err => {
             console.error('failed to restore backup: ', err)
+            setErrorDialogue({
+                visible: true,
+                title: 'Error Restoring Backup',
+                message: 'Failed to restore backup. Details: ' + err.message
+            })
         })
     }
 
@@ -382,6 +431,11 @@ const Dashboard = () => {
             console.log('install mod response: ', res)
         }).catch(err => {
             console.error("failed to install mod: ", err)
+            setErrorDialogue({
+                visible: true,
+                title: 'Error Installing Mod',
+                message: 'Failed to install mod. Details: ' + err.message
+            })
         })
     };
 
@@ -392,12 +446,22 @@ const Dashboard = () => {
                     updateServerState('scheduling', server.deployment_name)
                 }).catch(err => {
                     console.error("failed to scale server: ", err)
+                    setErrorDialogue({
+                        visible: true,
+                        title: 'Error Starting Server',
+                        message: 'Failed to start server. Details: ' + err.message
+                    })
                 })
                 return
             case 'stop':
                 updateServerState('terminating', server.deployment_name)
                 kubeApi.scaleServer(0).catch(err => {
                     console.error("failed to scale server: ", err)
+                    setErrorDialogue({
+                        visible: true,
+                        title: 'Error Stopping Server',
+                        message: 'Failed to stop server. Details: ' + err.message
+                    })
                 })
                 return
             case 'delete':
@@ -407,6 +471,11 @@ const Dashboard = () => {
                     ])
                 }).catch(err => {
                     console.error('failed to delete server: ', err)
+                    setErrorDialogue({
+                        visible: true,
+                        title: 'Error Deleting Server',
+                        message: 'Failed to delete server. Details: ' + err.message
+                    })
                 })
                 return
             default:
@@ -498,6 +567,17 @@ const Dashboard = () => {
             <div className="flex h-screen">
                 <Sidebar activeView={activeView} onViewChange={(v) => setActiveView(v)} />
                 <div className="flex-1 p-6 min-w-24">
+                    {
+                        errorDialogue.visible && (
+                            <Alert variant="destructive">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertTitle>{errorDialogue.title}</AlertTitle>
+                                <AlertDescription>
+                                    {errorDialogue.message}
+                                </AlertDescription>
+                            </Alert>
+                        )
+                    }
                     {renderViews()}
                 </div>
             </div>
