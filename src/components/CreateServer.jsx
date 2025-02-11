@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, AlertCircle } from "lucide-react"
+import {ChevronDown, AlertCircle, EyeOff, Eye} from "lucide-react"
 import {
     Card,
     CardContent,
@@ -26,7 +26,7 @@ import {
     SelectValue
 } from "@/components/ui/select";
 
-const CreateServer = ({ onServerCreate, existingWorlds }) => {
+const CreateServer = ({ onServerCreate, existingWorlds, formValues }) => {
     const [formData, setFormData] = useState({
         name: '',
         world: '',
@@ -48,8 +48,18 @@ const CreateServer = ({ onServerCreate, existingWorlds }) => {
         backupIntervalSeconds: 43200,
     });
 
-    const [errorData ,setErrorData] = useState({})
+    const [errorData, setErrorData] = useState({})
     const [worldSelect, setWorldSelect] = useState('new')
+    const [viewPass, setViewPass] = useState(false)
+
+    useEffect(() => {
+        if (formValues) {
+            setFormData(prev => ({
+                ...prev,
+                ...formValues,
+            }));
+        }
+    }, [formValues]);
 
 
     const handleSubmit = (e) => {
@@ -75,7 +85,7 @@ const CreateServer = ({ onServerCreate, existingWorlds }) => {
         <div className="p-0">
             <Card className="w-full max-w-2xl mx-auto mt-8">
                 <CardHeader>
-                    <CardTitle>Create New Valheim Server</CardTitle>
+                    <CardTitle>Configure your Valheim Server</CardTitle>
                     <CardDescription>Configure your dedicated Valheim server settings</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -156,13 +166,18 @@ const CreateServer = ({ onServerCreate, existingWorlds }) => {
 
                         <div className="space-y-2">
                             <Label>Password</Label>
-                            <Input
-                                type="password"
-                                value={formData.password}
-                                onChange={(e) => setFormData({...formData, password: e.target.value})}
-                                placeholder="Server access password"
-                                required
-                            />
+                            <div className="flex justify-items-center">
+                                <Input
+                                    type={viewPass ? "text" : "password"}
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                    placeholder="Server access password"
+                                    required
+                                />
+                                <Button variant="ghost" type="button" className="bg-transparent ml-2" onClick={() => setViewPass(prev => !prev)}>
+                                    {viewPass ? <EyeOff /> : <Eye />}
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -330,7 +345,7 @@ const CreateServer = ({ onServerCreate, existingWorlds }) => {
                             </CollapsibleContent>
                         </Collapsible>
 
-                        <Button type="submit" className="w-full">Create Server</Button>
+                        <Button type="submit" className="w-full">{formValues ? 'Save Server' : 'Create Server'}</Button>
                     </form>
                 </CardContent>
             </Card>

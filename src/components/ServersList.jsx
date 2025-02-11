@@ -2,11 +2,10 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import ServerDetailsCard from "@/components/ServerDetailsCard.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Clock, Server, Shield, Users} from "lucide-react";
 import { Skeleton } from '@/components/ui/skeleton';
 
 
-const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction }) => {
+const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, onEdit }) => {
 
     const renderSkeleton = () => {
         return (
@@ -73,7 +72,12 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction }) 
             ) : (
                 <div className="grid gap-4">
                     {loading ? renderSkeleton() : servers.map((server, i) => (
-                        <ServerDetailsCard id={`${server.deployment_name}_${i}`} serverData={server} onAction={(state) => onAction(server, state)} />
+                        <ServerDetailsCard
+                            id={`${server.deployment_name}_${i}`}
+                            serverData={server}
+                            onEdit={(server) => onEdit(server)}
+                            onAction={(state) => onAction(server, state)}
+                        />
                     ))}
                 </div>
             )}

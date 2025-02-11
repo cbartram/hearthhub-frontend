@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {Shield, Users, Server, Clock, LoaderCircle, RotateCcw, Play, Pause, Trash} from 'lucide-react';
+import {Shield, Users, Server, Clock, LoaderCircle, RotateCcw, Play, Pause, Trash, Pencil, Edit} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 
-const ServerDetailsCard = ({ serverData, id, onAction }) => {
+const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
     const { server_ip, server_port, world_details, state } = serverData;
 
     const getModifierBadgeColor = (key, value) => {
@@ -91,12 +91,14 @@ const ServerDetailsCard = ({ serverData, id, onAction }) => {
     return (
         <Card className="w-full max-w-2xl" key={id}>
             <CardHeader>
-                <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl font-bold">
+                <div className="flex justify-end items-center">
+                    <CardTitle className="flex-grow text-xl font-bold">
                         {world_details.name}
                     </CardTitle>
+                    <Button className="mr-2 py-6" disabled={state !== "stopped" && state !== "terminated"} onClick={() => onEdit(serverData)}><Edit /></Button>
                     {getBadge(state)}
                 </div>
+                <hr />
             </CardHeader>
 
             <CardContent className="space-y-6">

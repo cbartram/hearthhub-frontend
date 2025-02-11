@@ -22,6 +22,7 @@ const Dashboard = () => {
     const [mods, setMods] = useState([]);
     const [primaryBackups, setPrimaryBackups] = useState([])
     const [replicaBackups, setReplicaBackups] = useState([])
+    const [editedServer, setEditedServer] = useState({})
 
     useEffect(() => {
         const fetchData = async () => {
@@ -189,7 +190,6 @@ const Dashboard = () => {
                             })
                         ])
 
-                        console.log(`content op: ${content.operation}, installed = ${content.operation === "write"}`)
                         setPrimaryBackups([
                             ...primaryBackups.map(b => {
                                 if(b.installing) {
@@ -236,8 +236,24 @@ const Dashboard = () => {
         ])
     }
 
-    const handleCreateServer = (server) => {
-        setActiveView('servers')
+    /**
+     * Converts a list of modifiers (needed to send a request to the server) into an object; required to prepopulate
+     * form fields on the UI.
+     * @param modifiers
+     */
+    const modifierToObject = (modifiers) => {
+        const obj = {}
+        for(const modifier of modifiers) {
+            obj[modifier.key] = modifier.value
+        }
+        return obj
+    }
+
+    /**
+     * Converts an object with given modifier keys into a list of modifiers for the server to consume.
+     * @param server
+     */
+    const objToModifier = (server) => {
         const specificKeys = ['combat', 'deathpenalty', 'resources', 'raids', 'portals'];
         const modifiers = [];
 
@@ -246,14 +262,39 @@ const Dashboard = () => {
                 modifiers.push({ key, value: server[key] });
             }
         }
+        return modifiers
+    }
 
+    const handleEditServer = (server) => {
+        setActiveView('servers')
         const body = {
             "name": server.name,
             "world": server.world,
             "password": server.password,
             "public": server.isPublic,
             "enable_crossplay": server.isCrossplay,
-            "modifiers": modifiers,
+            "modifiers": objToModifier(server),
+            "save_interval_seconds": server.saveIntervalSeconds,
+            "backup_count": server.backupCount,
+            "initial_backup_seconds": server.initialBackupSeconds,
+            "backup_interval_seconds": server.backupIntervalSeconds
+        };
+
+        // TODO Create API route to handle patching an existing deployment with new container runtime args
+        // kubeApi.createServer(body).then((server) => setServers([...servers,  {...server, state: 'scheduling'}])).catch(err => {
+        //     console.error("api request to create server failed: ", err)
+        // })
+    }
+
+    const handleCreateServer = (server) => {
+        setActiveView('servers')
+        const body = {
+            "name": server.name,
+            "world": server.world,
+            "password": server.password,
+            "public": server.isPublic,
+            "enable_crossplay": server.isCrossplay,
+            "modifiers": objToModifier(server),
             "save_interval_seconds": server.saveIntervalSeconds,
             "backup_count": server.backupCount,
             "initial_backup_seconds": server.initialBackupSeconds,
@@ -352,8 +393,27 @@ const Dashboard = () => {
             loading={serversLoading}
             servers={servers}
             onServerCreateButtonClick={() => setActiveView('create-server')}
+            onEdit={(s) => {
+                setEditedServer(s.world_details)
+                setActiveView('edit-server')
+            }}
         />
         switch (activeView) {
+            case "edit-server":
+                return <CreateServer
+                    onServerCreate={(data) => handleEditServer(data)}
+                    existingWorlds={primaryBackups}
+                    formValues={{
+                        ...editedServer,
+                        saveIntervalSeconds: editedServer.save_interval_seconds,
+                        initialBackupSeconds: editedServer.initial_backup_seconds,
+                        backupIntervalSeconds: editedServer.backup_interval_seconds,
+                        backupCount: editedServer.backup_count,
+                        isCrossplay: editedServer.enable_crossplay,
+                        isPublic: editedServer.public,
+                        ...modifierToObject(editedServer.modifiers)
+                    }}
+                />
             case "create-server":
                 return <CreateServer onServerCreate={(s) => handleCreateServer(s)} existingWorlds={primaryBackups} />
             case "servers":
