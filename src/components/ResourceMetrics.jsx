@@ -17,12 +17,12 @@ const ResourceMetrics = ({ data }) => {
     };
 
     return (
-        <Card className="w-full my-6">
+        <Card className="w-full">
             <CardHeader>
                 <CardTitle>Server Resource Utilization</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="h-[300px] w-full">
+                <div className="h-[330px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                             data={data}

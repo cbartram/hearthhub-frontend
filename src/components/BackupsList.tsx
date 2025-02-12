@@ -164,7 +164,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
     }
 
     return (
-        <Card className="w-full max-w-4xl m-6">
+        <Card className="m-6">
             <CardHeader>
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl">Valheim Worlds</CardTitle>

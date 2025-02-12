@@ -81,9 +81,9 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, on
                             onAction={(state) => onAction(server, state)}
                         />
                     ))}
+                    <ResourceMetrics data={metrics} />
                 </div>
             )}
-            <ResourceMetrics data={metrics} />
         </div>
     );
 };
