@@ -11,13 +11,13 @@ import {
     Pause,
     Trash,
     Edit,
-    Globe2,
+    Globe2, Microchip, Network, Gamepad,
 } from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import DangerDialogue from "@/components/DangerDialogue";
 
 const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
-    const { server_ip, server_port, world_details, state } = serverData;
+    const { server_ip, server_port, world_details, state, server_memory, server_cpu } = serverData;
 
     const [showDialog, setShowDialog] = useState(false)
 
@@ -35,7 +35,6 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                     return 'bg-blue-500 hover:bg-blue-700';
             }
         }
-
 
         switch(value) {
             case 'easy':
@@ -120,7 +119,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                     {/* Connection Details */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Server className="h-4 w-4" />
+                            <Network className="h-12 w-4" />
                             <span>Connection Details</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
@@ -133,10 +132,26 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                         </div>
                     </div>
 
+                    {/* Hardware Resources */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Server className="h-12 w-4" />
+                            <span>Server Hardware</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="text-sm">
+                                <span className="font-medium">Memory:</span> {server_memory} Gb
+                            </div>
+                            <div className="text-sm">
+                                <span className="font-medium">CPU:</span> {server_cpu} cores
+                            </div>
+                        </div>
+                    </div>
+
                     {/* World Settings */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Globe2 className="h-4 w-4" />
+                            <Globe2 className="h-12 w-4" />
                             <span>World Settings</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
@@ -158,7 +173,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                     {/* Game Modifiers */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Shield className="h-4 w-4" />
+                            <Gamepad className="h-12 w-4" />
                             <span>Game Modifiers</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -176,7 +191,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                     {/* Backup Settings */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4" />
+                            <Clock className="h-12 w-4" />
                             <span>Backup & Save Settings</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
@@ -197,7 +212,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
 
                         <div className="space-y-2">
                             <div className="flex items-center ap-2 text-sm text-muted-foreground">
-                                <RotateCcw className="h-4 w-4" />
+                                <RotateCcw className="h-12 w-4" />
                                 <span>Actions</span>
                             </div>
                             <div className="gap-2 flex flex-grow">

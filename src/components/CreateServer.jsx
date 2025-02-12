@@ -25,8 +25,13 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
+import {Slider} from "@/components/ui/slider";
+import {cn} from "@/lib/utils.ts";
 
-const CreateServer = ({ onServerCreate, existingWorlds, formValues }) => {
+const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit }) => {
+    const [cpu, setCpu] = React.useState([1]);
+    const [memory, setMemory] = React.useState([1]);
+
     const [formData, setFormData] = useState({
         name: '',
         world: '',
@@ -73,13 +78,23 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues }) => {
         if(Object.keys(err).length > 0) {
             setErrorData({...errorData, ...err})
         } else {
-            onServerCreate({...formData})
+            onServerCreate({...formData, memoryRequest: memory[0], cpuRequest: cpu[0] })
         }
     };
 
     const sanitizeWorldName = (name) => {
         return name.slice(name.lastIndexOf("/") + 1, name.length - 3)
     }
+
+    const cpuMarks = Array.from({ length: cpuLimit }, (_, i) => ({
+        value: i + 1,
+        label: `${i + 1}`
+    }));
+
+    const memoryMarks = Array.from({ length: memoryLimit }, (_, i) => ({
+        value: i + 1,
+        label: `${i + 1}`
+    }));
 
     return (
         <div className="p-0">
@@ -194,6 +209,55 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues }) => {
                                     onCheckedChange={(checked) => setFormData({...formData, isPublic: checked})}
                                 />
                                 <Label>Public Server</Label>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <Label htmlFor="cpu">CPU Cores</Label>
+                                <span className="text-sm font-medium">{cpu[0]} cores</span>
+                            </div>
+                            <Slider
+                                id="cpu"
+                                min={1}
+                                max={cpuLimit}
+                                step={1}
+                                value={cpu}
+                                onValueChange={setCpu}
+                                className="w-full"
+                            />
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                                {cpuMarks.map((mark) => (
+                                    <span key={mark.value} className="flex flex-col items-center">
+                |
+                <span>{mark.label}</span>
+              </span>
+                                ))}
+                            </div>
+                        </div>
+
+
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <Label htmlFor="memory">Memory (GB)</Label>
+                                <span className="text-sm font-medium">{memory[0]} GB</span>
+                            </div>
+                            <Slider
+                                id="memory"
+                                min={1}
+                                max={memoryLimit}
+                                step={1}
+                                value={memory}
+                                onValueChange={setMemory}
+                                className="w-full"
+                            />
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                                {memoryMarks.map((mark) => (
+                                    <span key={mark.value} className="flex flex-col items-center">
+                |
+                <span>{mark.label}</span>
+              </span>
+                                ))}
                             </div>
                         </div>
 

@@ -120,7 +120,7 @@ class KubeApiClient extends ApiClient {
         return this.baseURL
     }
 
-    async getServer() {
+    async getServers() {
         return this.request('/api/v1/server/', {
             method: 'GET'
         });

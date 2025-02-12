@@ -18,6 +18,8 @@ const Dashboard = () => {
     const kubeApi = new KubeApiClient(user);
     const hearthhubApi = new HearthHubApiClient(user)
 
+    const [cpuLimit, setCpuLimit] = useState(2)
+    const [memLimit, setMemLimit] = useState(6)
     const [activeView, setActiveView] = useState('servers');
     const [serversLoading, setServersLoading] = useState(true)
     const [servers, setServers] = useState([])
@@ -35,8 +37,12 @@ const Dashboard = () => {
         const fetchData = async () => {
             try {
                 const [server, mods] = await Promise.all([
-                    kubeApi.getServer()
-                        .then(server => !server.hasOwnProperty('message') ? server : null)
+                    kubeApi.getServers()
+                        .then(s => {
+                            setServers(s.servers)
+                            setCpuLimit(s.cpu_limit)
+                            setMemLimit(s.memory_limit)
+                        })
                         .catch(err => {
                             console.error('failed to load servers: ', err);
                             setErrorDialogue({
@@ -89,6 +95,7 @@ const Dashboard = () => {
                         const backups = []
                         const replicas = []
                         const backupKeys = {}
+
                         for(const file of res.files) {
                             backupKeys[file.key] = ""
                         }
@@ -115,6 +122,16 @@ const Dashboard = () => {
                         // files and cognito then take the install status of cognito. If no match is found
                         // the backup has never been installed on the pvc.
                         setPrimaryBackups(backups.map(b => {
+
+                            if(user.installedBackups == null) {
+                                return {
+                                    ...b,
+                                    installing: false,
+                                    installed: false
+                                }
+                            }
+
+
                             for (const userBackup of user.installedBackups) {
                                 let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
                                 if (userBackup.name === shortName) {
@@ -134,6 +151,14 @@ const Dashboard = () => {
                         }))
 
                         setReplicaBackups(replicas.map(b => {
+                            if(user.installedBackups == null) {
+                                return {
+                                    ...b,
+                                    installing: false,
+                                    installed: false
+                                }
+                            }
+
                             for (const userBackup of user.installedBackups) {
                                 let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
                                 if (userBackup.name === shortName) {
@@ -357,6 +382,8 @@ const Dashboard = () => {
             "name": server.name,
             "world": server.world,
             "password": server.password,
+            "memory_request": server.memoryRequest,
+            "cpu_request": server.cpuRequest,
             "public": server.isPublic,
             "enable_crossplay": server.isCrossplay,
             "modifiers": objToModifier(server),
@@ -526,6 +553,8 @@ const Dashboard = () => {
         switch (activeView) {
             case "edit-server":
                 return <CreateServer
+                    cpuLimit={cpuLimit}
+                    memoryLimit={memLimit}
                     onServerCreate={(data) => handleEditServer(data)}
                     existingWorlds={primaryBackups}
                     formValues={{
@@ -540,7 +569,7 @@ const Dashboard = () => {
                     }}
                 />
             case "create-server":
-                return <CreateServer onServerCreate={(s) => handleCreateServer(s)} existingWorlds={primaryBackups} />
+                return <CreateServer cpuLimit={cpuLimit} memoryLimit={memLimit} onServerCreate={(s) => handleCreateServer(s)} existingWorlds={primaryBackups} />
             case "servers":
                 return serverList
             case "mods":
@@ -568,7 +597,7 @@ const Dashboard = () => {
                 <Navbar onLogout={logout} userId={user.discordId} avatarId={user.avatarId}/>
                 {
                     errorDialogue.visible && (
-                        <Alert variant="destructive">
+                        <Alert variant="destructive" className="m-6 max-w-3xl">
                             <AlertCircle className="h-4 w-4" />
                             <AlertTitle>{errorDialogue.title}</AlertTitle>
                             <AlertDescription>
