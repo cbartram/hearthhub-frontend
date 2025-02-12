@@ -85,8 +85,6 @@ export const AuthProvider = ({ children }) => {
                 return false
             }
 
-            console.log("user data from discord: ", data)
-
             const user = await createCognitoUser({
                 discord_id: data.id,
                 discord_username: data.username,
@@ -95,7 +93,6 @@ export const AuthProvider = ({ children }) => {
             })
 
             if(user !== null) {
-                console.log('Cognito user created successfully: ', user)
                 setUser(user);
                 localStorage.setItem("refreshToken", user.credentials.refresh_token)
                 localStorage.setItem("accessToken", user.credentials.access_token)

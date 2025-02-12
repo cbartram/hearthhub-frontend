@@ -15,7 +15,6 @@ const AuthCallback = () => {
 
             if (code) {
                 try {
-                    console.log(`Exchanging OAuth access token with code: ${code}`)
                     const response = await fetch(`${BASE_URL}/prod/api/v1/discord/oauth`, {
                         method: 'POST',
                         headers: {

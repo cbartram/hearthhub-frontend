@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import ServerDetailsCard from "@/components/ServerDetailsCard.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
+import ResourceMetrics from "@/components/ResourceMetrics";
 
 
 export const renderSkeleton = () => {
@@ -59,7 +60,7 @@ export const renderSkeleton = () => {
 };
 
 
-const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, onEdit }) => {
+const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, onEdit, metrics }) => {
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-6">Your Valheim Servers</h2>
@@ -82,6 +83,7 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, on
                     ))}
                 </div>
             )}
+            <ResourceMetrics data={metrics} />
         </div>
     );
 };

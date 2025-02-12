@@ -18,6 +18,7 @@ const Dashboard = () => {
     const kubeApi = new KubeApiClient(user);
     const hearthhubApi = new HearthHubApiClient(user)
 
+    const [resourceMetrics, setResourceMetrics] = useState([])
     const [cpuLimit, setCpuLimit] = useState(2)
     const [memLimit, setMemLimit] = useState(6)
     const [activeView, setActiveView] = useState('servers');
@@ -32,6 +33,15 @@ const Dashboard = () => {
         title: '',
         message: '',
     })
+
+    const stringToIntTruncated = (str) => {
+        const num = parseFloat(str);
+        if (isNaN(num)) {
+            return NaN; // Handle cases where the string is not a valid number
+        }
+        const truncatedNum = Math.trunc(num * 100) / 100;
+        return truncatedNum;
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -214,10 +224,19 @@ const Dashboard = () => {
 
         ws.addEventListener('message', (event) => {
             const message = JSON.parse(event.data)
-            console.log('received ws message:', message);
             const content = JSON.parse(message.content)
 
             switch(message.type) {
+                case "Metrics":
+                    setResourceMetrics([
+                        ...resourceMetrics,
+                        {
+                            cpu: stringToIntTruncated(content.cpuUtilization),
+                            memory: stringToIntTruncated(content.memoryUtilization),
+                            time: new Date().toLocaleTimeString()
+                        }
+                    ].slice(-20))
+                    break
                 case "PostStart":
                     updateServerState('loading', content.containerName)
                     break
@@ -291,7 +310,7 @@ const Dashboard = () => {
                 ws.close();
             }
         };
-    }, [servers, mods, primaryBackups]);
+    }, [servers, mods, primaryBackups, resourceMetrics]);
 
     const updateServerState = (state, containerName) => {
         setServers([
@@ -541,6 +560,7 @@ const Dashboard = () => {
 
     const renderViews = () => {
         const serverList = <ServersList
+            metrics={resourceMetrics}
             onAction={(server, state) => handleServerAction(server, state)}
             loading={serversLoading}
             servers={servers}
