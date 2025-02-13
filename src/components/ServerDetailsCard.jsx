@@ -17,7 +17,7 @@ import {Button} from "@/components/ui/button";
 import DangerDialogue from "@/components/DangerDialogue";
 
 const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
-    const { server_ip, server_port, world_details, state, server_memory, server_cpu } = serverData;
+    const { server_ip, server_port, world_details, state } = serverData;
 
     const [showDialog, setShowDialog] = useState(false)
 
@@ -140,10 +140,10 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="text-sm">
-                                <span className="font-medium">Memory:</span> {server_memory} Gb
+                                <span className="font-medium">Memory:</span> {world_details.memory_requests} Gb
                             </div>
                             <div className="text-sm">
-                                <span className="font-medium">CPU:</span> {server_cpu} cores
+                                <span className="font-medium">CPU:</span> {world_details.cpu_requests} cores
                             </div>
                         </div>
                     </div>
