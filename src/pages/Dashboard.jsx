@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {useAuth} from '@/context/AuthContext.jsx'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
@@ -49,7 +49,13 @@ const Dashboard = () => {
                 const [server, mods] = await Promise.all([
                     kubeApi.getServers()
                         .then(s => {
-                            setServers(s.servers)
+                            setServers([
+                                ...s.servers.map(serv => ({
+                                    ...serv,
+                                    // Insert temp join code while we wait for the actual to come through ws
+                                    joinCode: ""
+                                }))
+                            ])
                             setCpuLimit(s.cpu_limit)
                             setMemLimit(s.memory_limit)
                         })
@@ -203,102 +209,104 @@ const Dashboard = () => {
         fetchData();
     }, [])
 
-    useEffect(() => {
-        // TODO something about hearthhub.duckdns.org is causing issues here.
-        const ws = new WebSocket(`http://71.77.136.117/ws?id=${user.discordId}`);
+    // Memoized WebSocket message handler
+    const handleWebSocketMessage = useCallback((event) => {
+        const message = JSON.parse(event.data);
+        const content = JSON.parse(message.content);
 
-        ws.addEventListener('message', (event) => {
-            const message = JSON.parse(event.data)
-            const content = JSON.parse(message.content)
-
-            if(message.type !== "Metrics") {
-                console.log('received msg: ', message)
-            }
-            switch(message.type) {
-                case "Metrics":
-                    setResourceMetrics([
-                        ...resourceMetrics,
+        if(message.type !== "Metrics") {
+            console.log('ws message:', message)
+        }
+        switch (message.type) {
+            case "JoinCode":
+                setServers(prevServers =>
+                    prevServers.map(serv => {
+                        console.log("serv: ", serv, content.joinCode)
+                        if(serv.deployment_name === content.containerName) {
+                            return {
+                                ...serv,
+                                joinCode: content.joinCode
+                            }
+                        }
+                        return serv
+                    })
+                );
+                break;
+            case "Metrics":
+                setResourceMetrics((prevMetrics) =>
+                    [
+                        ...prevMetrics,
                         {
                             cpu: stringToIntTruncated(content.cpuUtilization),
                             memory: stringToIntTruncated(content.memoryUtilization),
-                            time: new Date().toLocaleTimeString()
-                        }
-                    ].slice(-20))
-                    break
-                case "PostStart":
-                    updateServerState('loading', content.containerName)
-                    break
-                case "ContainerReady":
-                    if(content.containerType === "server") {
-                        updateServerState('running', content.containerName)
-                    }
-                    break
-                case "PreStop":
-                    if(content.containerType === "file-install") {
-                        setMods([
-                            ...mods.map(m => {
-                                // We don't have a way to tie the mod state in react to the k8s job
-                                // which installed the mod so clicking to install 3 mods at once when 1
-                                // websocket event comes in all 3 mods will have their state updated at once.
-                                if(m.installing) {
-                                    return {
-                                        ...m,
-                                        installing: false,
-                                        installed: content.operation === "write"
-                                    }
-                                }
-                                return m
-                            })
-                        ])
+                            time: new Date().toLocaleTimeString(),
+                        },
+                    ].slice(-20)
+                );
+                break;
+            case "PostStart":
+                updateServerState('loading', content.containerName);
+                break;
+            case "ContainerReady":
+                if (content.containerType === "server") {
+                    updateServerState('running', content.containerName);
+                }
+                break;
+            case "PreStop":
+                if (content.containerType === "file-install") {
+                    setMods((prevMods) =>
+                        prevMods.map((m) =>
+                            m.installing
+                                ? { ...m, installing: false, installed: content.operation === "write" }
+                                : m
+                        )
+                    );
 
-                        setPrimaryBackups([
-                            ...primaryBackups.map(b => {
-                                if(b.installing) {
-                                    return {
-                                        ...b,
-                                        installing: false,
-                                        installed: content.operation === "write"
-                                    }
-                                }
-                                return b
-                            })
-                        ])
+                    setPrimaryBackups((prevBackups) =>
+                        prevBackups.map((b) =>
+                            b.installing
+                                ? { ...b, installing: false, installed: content.operation === "write" }
+                                : b
+                        )
+                    );
 
-                        setReplicaBackups([
-                            ...replicaBackups.map(r => {
-                                if(r.installing) {
-                                    return {
-                                        ...r,
-                                        installing: false
-                                    }
-                                }
-                                return r
-                            })
-                        ])
-                    } else if (content.containerType === "server") {
-                        updateServerState('stopped', content.containerName)
-                    }
-                    break
-                default:
-                    console.log(`unknown message type: ${message.type} content = ${message.content}`)
-            }
-        });
+                    setReplicaBackups((prevReplicas) =>
+                        prevReplicas.map((r) =>
+                            r.installing ? { ...r, installing: false } : r
+                        )
+                    );
+                } else if (content.containerType === "server") {
+                    updateServerState('stopped', content.containerName);
+                }
+                break;
+            default:
+                console.log(`unknown message type: ${message.type} content = ${message.content}`);
+        }
+    }, []);
 
+    // WebSocket setup
+    useEffect(() => {
+        const ws = new WebSocket(`http://71.77.136.117/ws?id=${user.discordId}`);
+        // Use below to test websocket messages quickly and emulate the kube server
+        // const ws = new WebSocket("http://localhost:8080")
+
+        ws.addEventListener('message', handleWebSocketMessage);
         ws.addEventListener('error', (event) => {
             console.error('websocket error:', event);
             setErrorDialogue({
                 visible: true,
                 title: 'Error receiving event',
-                message: `Failed to receive websocket event. Details: ${event}`
-            })
+                message: `Failed to receive websocket event. Details: ${event}`,
+            });
         });
 
         return () => {
             if (ws) {
+                console.log('closing ws');
                 ws.close();
             }
         };
-    }, [servers, mods, primaryBackups, resourceMetrics]);
+    }, [handleWebSocketMessage, user.discordId]);
 
     const updateServerState = (state, containerName) => {
         setServers([

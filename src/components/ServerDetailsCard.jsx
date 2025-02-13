@@ -11,13 +11,13 @@ import {
     Pause,
     Trash,
     Edit,
-    Globe2, Microchip, Network, Gamepad,
+    Globe2, Network, Gamepad,
 } from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import DangerDialogue from "@/components/DangerDialogue";
 
 const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
-    const { server_ip, server_port, world_details, state } = serverData;
+    const { server_ip, server_port, world_details, state, joinCode } = serverData;
 
     const [showDialog, setShowDialog] = useState(false)
 
@@ -123,12 +123,34 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                             <span>Connection Details</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="text-sm">
-                                <span className="font-medium">IP:</span> {server_ip}
-                            </div>
-                            <div className="text-sm">
-                                <span className="font-medium">Port:</span> {server_port}
-                            </div>
+                            {
+                                (state === "terminated" || state === "stopped") ? (
+                                    <span className="text-lg">
+                                        No Server
+                                    </span>
+                                ) : (
+                                    <>
+                                        <div className="text-sm">
+                                            <span className="font-medium">IP:</span> {server_ip}
+                                        </div>
+                                        <div className="text-sm">
+                                            <span className="font-medium">Port:</span> {server_port}
+                                        </div>
+                                        <div className="text-sm">
+                                            <span className="font-medium">Join Code:
+                                                <Badge className="bg-blue-200 text-blue-800 hover:bg-blue-300 ml-2 p-1 px-2 text-sm">
+                                                    {
+                                                        joinCode === "" ?
+                                                            <>
+                                                                <LoaderCircle height={15} className="animate-spin" /> Loading...
+                                                            </> : joinCode
+                                                    }
+                                                </Badge>
+                                            </span>
+                                        </div>
+                                    </>
+                                )
+                            }
                         </div>
                     </div>
 

@@ -26,7 +26,6 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import {Slider} from "@/components/ui/slider";
-import {cn} from "@/lib/utils.ts";
 
 const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit }) => {
     const [cpu, setCpu] = React.useState([1]);
@@ -74,6 +73,9 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
         if(formData.password.length < 4) {
             err['password'] = 'Your server password cannot be less than 4 characters.'
         }
+
+        formData.world = formData.world.replaceAll(" ", "-")
+        formData.name = formData.name.replaceAll(" ", "-")
 
         if(Object.keys(err).length > 0) {
             setErrorData({...errorData, ...err})
