@@ -124,7 +124,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             {
-                                (state === "terminated" || state === "stopped") ? (
+                                (state === "terminated" || state === "stopped" || state === "scheduling") ? (
                                     <span className="text-lg">
                                         No Server
                                     </span>

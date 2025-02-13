@@ -187,9 +187,9 @@ const Dashboard = () => {
                     })
                 ]);
 
-                if (server) {
-                    setServers([server]);
-                }
+                // if (server) {
+                //     setServers([server]);
+                // }
 
                 if (mods.length > 0) {
                     setMods([...mods]);
@@ -221,7 +221,6 @@ const Dashboard = () => {
             case "JoinCode":
                 setServers(prevServers =>
                     prevServers.map(serv => {
-                        console.log("serv: ", serv, content.joinCode)
                         if(serv.deployment_name === content.containerName) {
                             return {
                                 ...serv,
@@ -309,17 +308,17 @@ const Dashboard = () => {
     }, [handleWebSocketMessage, user.discordId]);
 
     const updateServerState = (state, containerName) => {
-        setServers([
-            ...servers.map(s => {
-                if(s.deployment_name === containerName) {
+        setServers(prevServers =>
+            prevServers.map(serv => {
+                if(serv.deployment_name === containerName) {
                     return {
-                        ...s,
+                        ...serv,
                         state
                     }
                 }
-                return s
+                return serv
             })
-        ])
+        );
     }
 
     /**
