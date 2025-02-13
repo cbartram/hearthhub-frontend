@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -17,6 +17,10 @@ const ModInstall = ({mods, handleModToggle}) => {
 
         setShownMods(mods.filter(m => m.name.toLowerCase().includes(val.toLowerCase())))
     }
+
+    useEffect(() => {
+        setShownMods(mods)
+    }, [mods])
 
     const getBadgeClass = (mod) => {
         if(mod.installing) {

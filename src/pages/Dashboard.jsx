@@ -63,6 +63,7 @@ const Dashboard = () => {
                             return []
                         }),
 
+
                     hearthhubApi.listFiles("mods")
                         .then(res => {
                             if (res.hasOwnProperty("files")) {
@@ -80,9 +81,11 @@ const Dashboard = () => {
                                         installing: false,
                                     }
 
-                                    for (const userInstalledMod of user.installedMods) {
-                                        if (userInstalledMod.name.slice(0, -4) === filename) {
-                                            remappedMod.installed = userInstalledMod.installed
+                                    // Incorporate cognito data from when a user installed a mod (previously) so that
+                                    // we can mark the mod as installed already.
+                                    for (const key in user.installedMods) {
+                                        if (key.slice(0, -4) === filename) {
+                                            remappedMod.installed = user.installedMods[key]
                                         }
                                     }
 
@@ -132,23 +135,13 @@ const Dashboard = () => {
                         // files and cognito then take the install status of cognito. If no match is found
                         // the backup has never been installed on the pvc.
                         setPrimaryBackups(backups.map(b => {
-
-                            if(user.installedBackups == null) {
-                                return {
-                                    ...b,
-                                    installing: false,
-                                    installed: false
-                                }
-                            }
-
-
-                            for (const userBackup of user.installedBackups) {
+                            for (const key in user.installedBackups) {
                                 let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
-                                if (userBackup.name === shortName) {
+                                if (key === shortName) {
                                     return {
                                         ...b,
                                         installing: false,
-                                        installed: userBackup.installed
+                                        installed: user.installedBackups[key]
                                     }
                                 }
                             }
@@ -161,21 +154,13 @@ const Dashboard = () => {
                         }))
 
                         setReplicaBackups(replicas.map(b => {
-                            if(user.installedBackups == null) {
-                                return {
-                                    ...b,
-                                    installing: false,
-                                    installed: false
-                                }
-                            }
-
-                            for (const userBackup of user.installedBackups) {
+                            for (const key in user.installedBackups) {
                                 let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
-                                if (userBackup.name === shortName) {
+                                if (key === shortName) {
                                     return {
                                         ...b,
                                         installing: false,
-                                        installed: userBackup.installed
+                                        installed: user.installedBackups[key]
                                     }
                                 }
                             }
@@ -226,6 +211,9 @@ const Dashboard = () => {
             const message = JSON.parse(event.data)
             const content = JSON.parse(message.content)
 
+            if(message.type !== "Metrics") {
+                console.log('received msg: ', message)
+            }
             switch(message.type) {
                 case "Metrics":
                     setResourceMetrics([
@@ -589,7 +577,12 @@ const Dashboard = () => {
                     }}
                 />
             case "create-server":
-                return <CreateServer cpuLimit={cpuLimit} memoryLimit={memLimit} onServerCreate={(s) => handleCreateServer(s)} existingWorlds={primaryBackups} />
+                return <CreateServer
+                    cpuLimit={cpuLimit}
+                    memoryLimit={memLimit}
+                    onServerCreate={(s) => handleCreateServer(s)}
+                    existingWorlds={primaryBackups}
+                />
             case "servers":
                 return serverList
             case "mods":
