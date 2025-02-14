@@ -1,4 +1,4 @@
-import {K8S_BASE_URL, BASE_URL} from "@/lib/constants.ts";
+import {K8S_BASE_URL} from "@/lib/constants.ts";
 
 
 class ApiClient {
@@ -53,53 +53,6 @@ class ApiClient {
 }
 
 /**
- * HearthHub API client provides a frontend abstraction for:
- * - The Lambda API client responsible for discord sign-up, login, and file upload / fetching from S3.
- */
-class HearthHubApiClient extends ApiClient {
-    constructor(user) {
-        super(user);
-        this.baseURL = BASE_URL
-    }
-
-    getBaseUrl() {
-        return this.baseURL
-    }
-
-    getHeaders() {
-        const headers = new Headers();
-        headers.append("Authorization", `Bearer ${this.user.credentials.id_token}`);
-        headers.append("Content-Type", "application/json");
-        return headers;
-    }
-
-    async listFiles(type) {
-        const validTypes = {
-            "mods": "",
-            "mods/": "",
-            "configs": "",
-            "configs/": "",
-            "backups": "",
-            "backups/": ""
-        }
-
-        if(!(type in validTypes)) {
-            console.error(`${type} is not a valid file prefix.`)
-            return Promise.reject(`${type} is not a valid file prefix`)
-        }
-
-        return this.request(`/prod/api/v1/file?discordId=${this.user.discordId}&prefix=${type}&refreshToken=${this.user.credentials.refresh_token}`, {
-            method: 'GET',
-            headers: {
-                "Authorization": `Bearer ${this.user.credentials.id_token}`,
-                "Content-Type": "application/json"
-            }
-        });
-    }
-}
-
-
-/**
  * Functions as the client for the Kubernetes API client hosted on the kubernetes cluster.
  * This API is responsible for all server, file install, and backup operations.
  */
@@ -118,6 +71,30 @@ class KubeApiClient extends ApiClient {
 
     getBaseUrl() {
         return this.baseURL
+    }
+
+    async listFiles(type) {
+        const validTypes = {
+            "mods": "",
+            "mods/": "",
+            "configs": "",
+            "configs/": "",
+            "backups": "",
+            "backups/": ""
+        }
+
+        if(!(type in validTypes)) {
+            console.error(`${type} is not a valid file prefix.`)
+            return Promise.reject(`${type} is not a valid file prefix`)
+        }
+
+        return this.request(`/api/v1/file?prefix=${type}`, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Basic ${btoa(this.user.discordId + ":" + this.user.credentials.refresh_token)}`,
+                "Content-Type": "application/json"
+            }
+        });
     }
 
     async getServers() {
@@ -161,8 +138,6 @@ class KubeApiClient extends ApiClient {
     }
 }
 
-// Create and export a singleton instance
 export {
-    KubeApiClient,
-    HearthHubApiClient
+    KubeApiClient
 };

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import {BASE_URL} from "@/lib/constants.ts";
+import {K8S_BASE_URL} from "@/lib/constants.ts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -41,7 +41,7 @@ export function formatBytes(bytes: number): string {
  */
 export async function createCognitoUser(req: CreateUserRequest) {
   try {
-    const response = await fetch(`${BASE_URL}/prod/api/v1/cognito/create-user`, {
+    const response = await fetch(`${K8S_BASE_URL}/api/v1/cognito/create-user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

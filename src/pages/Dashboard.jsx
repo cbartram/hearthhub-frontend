@@ -5,7 +5,7 @@ import Sidebar from '@/components/Sidebar'
 import CreateServer from '@/components/CreateServer'
 import ServersList from "@/components/ServersList.jsx";
 import ModInstall from "@/components/ModInstall";
-import {KubeApiClient, HearthHubApiClient} from "@/lib/api.js";
+import {KubeApiClient} from "@/lib/api.js";
 import {formatBytes} from "@/lib/utils.ts";
 import BackupsList from "@/components/BackupsList";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
@@ -16,7 +16,6 @@ const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", 
 const Dashboard = () => {
     const {user, logout} = useAuth()
     const kubeApi = new KubeApiClient(user);
-    const hearthhubApi = new HearthHubApiClient(user)
 
     const [resourceMetrics, setResourceMetrics] = useState([])
     const [cpuLimit, setCpuLimit] = useState(2)
@@ -70,7 +69,9 @@ const Dashboard = () => {
                         }),
 
 
-                    hearthhubApi.listFiles("mods")
+                    // TODO We make 2 separate API requests for listing mods and backups. Just return all the files for a user in this structure
+                    // { mods: [...], backups: [...] }
+                    kubeApi.listFiles("mods")
                         .then(res => {
                             if (res.hasOwnProperty("files")) {
                                 return res.files.map((file, i) => {
@@ -110,7 +111,7 @@ const Dashboard = () => {
                             return [];
                         }),
 
-                    hearthhubApi.listFiles("backups").then(res => {
+                    kubeApi.listFiles("backups").then(res => {
                         const backups = []
                         const replicas = []
                         const backupKeys = {}
@@ -186,10 +187,6 @@ const Dashboard = () => {
                         })
                     })
                 ]);
-
-                // if (server) {
-                //     setServers([server]);
-                // }
 
                 if (mods.length > 0) {
                     setMods([...mods]);

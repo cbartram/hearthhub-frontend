@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import {createCognitoUser} from '@/lib/utils.ts'
-import {BASE_URL} from "@/lib/constants.ts";
+import {K8S_BASE_URL} from "@/lib/constants.ts";
 const AuthContext = createContext(null);
 
 // AuthProvider is used in main.jsx and provides the login, logout, and user props to any component
@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }) => {
      */
     const getUser = async () => {
         const refreshToken = localStorage.getItem("refreshToken")
-        const idToken = localStorage.getItem("idToken")
         const discordId = localStorage.getItem("discordId")
 
         if(refreshToken == null || discordId == null) {
@@ -29,12 +28,11 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch(`${BASE_URL}/prod/api/v1/cognito/auth`, {
+            const response = await fetch(`${K8S_BASE_URL}/api/v1/cognito/auth`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Odd, but the id token is actually used as the access token for API GW cognito authorizers
-                    'Authorization': `Bearer ${idToken}`
+                    'Authorization': "Basic " + btoa(`${discordId}:${refreshToken}`)
                 },
                 body: JSON.stringify({
                     refreshToken: refreshToken,
@@ -49,7 +47,6 @@ export const AuthProvider = ({ children }) => {
                 return Promise.reject("Failed to auth user: unexpected response code: " + response.status)
             }
 
-            console.log("cognito user:", data)
             setUser(data)
         } catch (error) {
             console.error('Login error:', error);

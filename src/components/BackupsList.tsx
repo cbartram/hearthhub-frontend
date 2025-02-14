@@ -194,7 +194,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                                 <TableHead>World File</TableHead>
                                 <TableHead>Server State</TableHead>
                                 <TableHead className="text-right">Size</TableHead>
-                                <TableHead className="text-right">Install Backup</TableHead>
+                                <TableHead className="text-right">Install World</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -228,7 +228,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Backup File</TableHead>
-                                <TableHead>Install</TableHead>
+                                <TableHead>Restore Backup (overwrite world)</TableHead>
                                 <TableHead>Timestamp</TableHead>
                                 <TableHead className="text-right">Size</TableHead>
                             </TableRow>

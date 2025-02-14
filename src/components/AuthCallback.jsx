@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from "@/assets/hearthhub_logo.png";
-import {BASE_URL} from "@/lib/constants.ts";
+import {K8S_BASE_URL} from "@/lib/constants.ts";
 import {useAuth} from "@/context/AuthContext.jsx"
 
 const AuthCallback = () => {
@@ -15,7 +15,7 @@ const AuthCallback = () => {
 
             if (code) {
                 try {
-                    const response = await fetch(`${BASE_URL}/prod/api/v1/discord/oauth`, {
+                    const response = await fetch(`${K8S_BASE_URL}/api/v1/discord/oauth`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
