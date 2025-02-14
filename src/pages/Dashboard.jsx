@@ -71,10 +71,15 @@ const Dashboard = () => {
 
                     // TODO We make 2 separate API requests for listing mods and backups. Just return all the files for a user in this structure
                     // { mods: [...], backups: [...] }
-                    kubeApi.listFiles("mods")
+                    kubeApi.listFiles()
                         .then(res => {
-                            if (res.hasOwnProperty("files")) {
-                                return res.files.map((file, i) => {
+                            const backups = []
+                            const replicas = []
+                            const backupKeys = {}
+
+                            // Re-map mods
+                            setMods([
+                                ...res.mods.map((file, i) => {
                                     const parts = file.key.split('/');
                                     let filename = parts[parts.length - 1];
                                     filename = filename.slice(0, -4);
@@ -97,8 +102,73 @@ const Dashboard = () => {
                                     }
 
                                     return remappedMod;
-                                });
+                                })
+                            ])
+
+                            // Re-map backups
+                            for(const file of res.backups) {
+                                backupKeys[file.key] = ""
                             }
+
+                            // Note: we only push .db files, .fwl files are stored and synced along with db's on the backend
+                            // however, as to not confuse users and avoid any file name issues when merging user state in cognito
+                            // we only present .db files for install to users.
+                            for(const file of res.backups) {
+                                let ext = file.key.slice(file.key.lastIndexOf(".") + 1, file.key.length)
+                                let base = file.key.slice(0, file.key.lastIndexOf("."))
+                                if(file.key.includes("_backup_auto-") && ext === "db") {
+                                    if(backupKeys.hasOwnProperty(`${base}.fwl`)) {
+                                        replicas.push(file)
+                                    } else {
+                                        console.log(`replica: ${file.key} does not have corresponding .fwl`)
+                                    }
+                                } else if(ext === "db") {
+                                    backups.push(file)
+                                }
+                            }
+
+
+                            // Check each backup install status from cognito, if there is a match between the s3
+                            // files and cognito then take the install status of cognito. If no match is found
+                            // the backup has never been installed on the pvc.
+                            setPrimaryBackups(backups.map(b => {
+                                for (const key in user.installedBackups) {
+                                    let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
+                                    if (key === shortName) {
+                                        return {
+                                            ...b,
+                                            installing: false,
+                                            installed: user.installedBackups[key]
+                                        }
+                                    }
+                                }
+
+                                return {
+                                    ...b,
+                                    installing: false,
+                                    installed: false
+                                }
+                            }))
+
+                            setReplicaBackups(replicas.map(b => {
+                                for (const key in user.installedBackups) {
+                                    let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
+                                    if (key === shortName) {
+                                        return {
+                                            ...b,
+                                            installing: false,
+                                            installed: user.installedBackups[key]
+                                        }
+                                    }
+                                }
+
+                                return {
+                                    ...b,
+                                    installing: false,
+                                    installed: false
+                                }
+                            }))
+
                             return [];
                         })
                         .catch(err => {
@@ -110,87 +180,7 @@ const Dashboard = () => {
                             })
                             return [];
                         }),
-
-                    kubeApi.listFiles("backups").then(res => {
-                        const backups = []
-                        const replicas = []
-                        const backupKeys = {}
-
-                        for(const file of res.files) {
-                            backupKeys[file.key] = ""
-                        }
-
-                        // Note: we only push .db files, .fwl files are stored and synced along with db's on the backend
-                        // however, as to not confuse users and avoid any file name issues when merging user state in cognito
-                        // we only present .db files for install to users.
-                        for(const file of res.files) {
-                            let ext = file.key.slice(file.key.lastIndexOf(".") + 1, file.key.length)
-                            let base = file.key.slice(0, file.key.lastIndexOf("."))
-                            if(file.key.includes("_backup_auto-") && ext === "db") {
-                                if(backupKeys.hasOwnProperty(`${base}.fwl`)) {
-                                    replicas.push(file)
-                                } else {
-                                    console.log(`replica: ${file.key} does not have corresponding .fwl`)
-                                }
-                            } else if(ext === "db") {
-                                backups.push(file)
-                            }
-                        }
-
-
-                        // Check each backup install status from cognito, if there is a match between the s3
-                        // files and cognito then take the install status of cognito. If no match is found
-                        // the backup has never been installed on the pvc.
-                        setPrimaryBackups(backups.map(b => {
-                            for (const key in user.installedBackups) {
-                                let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
-                                if (key === shortName) {
-                                    return {
-                                        ...b,
-                                        installing: false,
-                                        installed: user.installedBackups[key]
-                                    }
-                                }
-                            }
-
-                            return {
-                                ...b,
-                                installing: false,
-                                installed: false
-                            }
-                        }))
-
-                        setReplicaBackups(replicas.map(b => {
-                            for (const key in user.installedBackups) {
-                                let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
-                                if (key === shortName) {
-                                    return {
-                                        ...b,
-                                        installing: false,
-                                        installed: user.installedBackups[key]
-                                    }
-                                }
-                            }
-
-                            return {
-                                ...b,
-                                installing: false,
-                                installed: false
-                            }
-                        }))
-                    }).catch(err => {
-                        console.error("error fetching backups: ", err)
-                        setErrorDialogue({
-                            visible: true,
-                            title: 'Error retrieving backups',
-                            message: 'Failed to retrieve backup files. Details: ' + err.message
-                        })
-                    })
                 ]);
-
-                if (mods.length > 0) {
-                    setMods([...mods]);
-                }
             } catch (err) {
                 console.error("Error fetching data: ", err);
                 setErrorDialogue({

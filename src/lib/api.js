@@ -1,4 +1,4 @@
-import {K8S_BASE_URL} from "@/lib/constants.ts";
+import {K8S_BASE_URL, isProd} from "@/lib/constants.ts";
 
 
 class ApiClient {
@@ -70,30 +70,16 @@ class KubeApiClient extends ApiClient {
     }
 
     getBaseUrl() {
-        return this.baseURL
+        if(isProd()) {
+            return this.baseURL
+        } else {
+            return "http://localhost:8080"
+        }
     }
 
-    async listFiles(type) {
-        const validTypes = {
-            "mods": "",
-            "mods/": "",
-            "configs": "",
-            "configs/": "",
-            "backups": "",
-            "backups/": ""
-        }
-
-        if(!(type in validTypes)) {
-            console.error(`${type} is not a valid file prefix.`)
-            return Promise.reject(`${type} is not a valid file prefix`)
-        }
-
-        return this.request(`/api/v1/file?prefix=${type}`, {
-            method: 'GET',
-            headers: {
-                "Authorization": `Basic ${btoa(this.user.discordId + ":" + this.user.credentials.refresh_token)}`,
-                "Content-Type": "application/json"
-            }
+    async listFiles() {
+        return this.request("/api/v1/file", {
+            method: 'GET'
         });
     }
 
