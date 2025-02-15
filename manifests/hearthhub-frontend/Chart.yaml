@@ -1,0 +1,6 @@
+apiVersion: v2
+name: hearthhub-frontend
+description: The server responsible for serving the HearthHub UI
+type: application
+version: 0.1.0
+appVersion: "1.16.0"

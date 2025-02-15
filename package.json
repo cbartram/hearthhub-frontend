@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "aws s3 rm --recursive s3://hearthhub-ui/ && aws s3 sync dist/ s3://hearthhub-ui"
+    "deploy": "docker build . -t cbartram/hearthhub-frontend:latest && docker push cbartram/hearthhub-frontend:latest && helm upgrade hearthhub-frontend ./manifests/hearthhub-frontend -f ./manifests/hearthhub-frontend/values.yaml"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.2",

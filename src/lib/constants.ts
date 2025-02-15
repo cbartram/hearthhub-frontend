@@ -2,7 +2,6 @@
 const K8S_BASE_URL: string = "https://hearthhub.duckdns.org"
 
 const isProd = () => {
-   // return true
     return window.location.hostname !== "localhost"
 }
 

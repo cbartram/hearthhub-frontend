@@ -273,7 +273,9 @@ const Dashboard = () => {
 
     // WebSocket setup
     useEffect(() => {
-        const ws = new WebSocket(`${isProd() ? K8S_BASE_URL : "http://localhost:8080"}/ws?id=${user.discordId}`);
+        const ws = new WebSocket('wss://hearthhub.duckdns.org/ws');
+
+        // const ws = new WebSocket(`${isProd() ? K8S_BASE_URL : "http://localhost:8080"}/ws?id=${user.discordId}`);
 
         ws.addEventListener('message', handleWebSocketMessage);
         ws.addEventListener('error', (event) => {
