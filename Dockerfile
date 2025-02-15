@@ -5,6 +5,7 @@ WORKDIR /app
 COPY server.py .
 
 COPY dist/ /app/static/
+RUN chmod -R 755 /app/static
 
 EXPOSE 8080
 

@@ -13,7 +13,7 @@ import {isProd} from "@/lib/constants.ts";
 
 const discordRedirect = () => {
     if(isProd()) {
-        window.location.href = "https://discord.com/oauth2/authorize?client_id=1330916460343857184&response_type=code&redirect_uri=http%3A%2F%2Fhearthhub-ui.s3-website-us-east-1.amazonaws.com%2Fdiscord%2Foauth&scope=identify+email"
+        window.location.href = "https://discord.com/oauth2/authorize?client_id=1330916460343857184&response_type=code&redirect_uri=https%3A%2F%2Fhearthhub.duckdns.org%2Fdiscord%2Foauth&scope=identify+email"
     } else {
         window.location.href = "https://discord.com/oauth2/authorize?client_id=1330916460343857184&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fdiscord%2Foauth&scope=email+identify"
     }
