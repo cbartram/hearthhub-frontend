@@ -140,7 +140,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
                                             <span className="font-medium">Join Code:
                                                 <Badge className="bg-blue-200 text-blue-800 hover:bg-blue-300 ml-2 p-1 px-2 text-sm">
                                                     {
-                                                        joinCode === "" ?
+                                                        joinCode === "" && state !== "starting" ?
                                                             <>
                                                                 <LoaderCircle height={15} className="animate-spin" /> Loading...
                                                             </> : joinCode

@@ -10,6 +10,7 @@ import {formatBytes} from "@/lib/utils.ts";
 import BackupsList from "@/components/BackupsList";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
+import {isProd, K8S_BASE_URL} from "@/lib/constants";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
@@ -272,9 +273,7 @@ const Dashboard = () => {
 
     // WebSocket setup
     useEffect(() => {
-        const ws = new WebSocket(`http://71.77.136.117/ws?id=${user.discordId}`);
-        // Use below to test websocket messages quickly and emulate the kube server
-        // const ws = new WebSocket("http://localhost:8080")
+        const ws = new WebSocket(`${isProd() ? K8S_BASE_URL : "http://localhost:8080"}/ws?id=${user.discordId}`);
 
         ws.addEventListener('message', handleWebSocketMessage);
         ws.addEventListener('error', (event) => {
@@ -496,6 +495,15 @@ const Dashboard = () => {
                 kubeApi.deleteServer().then(res => {
                     setServers([
                         ...servers.filter(s => !res.resources.includes(s.deployment_name))
+                    ])
+
+                    // Ensures no installable worlds or backups show up as options after a user successfully
+                    // deletes their server.
+                    setPrimaryBackups([
+                        ...primaryBackups.map(b => ({ ...b, installed: false, installing: false }))
+                    ])
+                    setReplicaBackups([
+                        ...replicaBackups.map(r => ({...r, installed: false, installing: false }))
                     ])
                 }).catch(err => {
                     console.error('failed to delete server: ', err)
