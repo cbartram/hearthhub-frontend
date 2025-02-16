@@ -16,7 +16,7 @@ import {
 import {Button} from "@/components/ui/button";
 import DangerDialogue from "@/components/DangerDialogue";
 
-const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
+const ServerDetailsCard = ({ serverData, onAction, onEdit }) => {
     const { server_ip, server_port, world_details, state, joinCode } = serverData;
 
     const [showDialog, setShowDialog] = useState(false)
@@ -103,7 +103,7 @@ const ServerDetailsCard = ({ serverData, id, onAction, onEdit }) => {
 
     return (
         <>
-            <Card className="w-full max-w-2xl" key={id}>
+            <Card className="w-full max-w-2xl">
                 <CardHeader>
                     <div className="flex justify-end items-center">
                         <CardTitle className="flex-grow text-2xl font-bold">

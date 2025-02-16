@@ -75,7 +75,7 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, on
                 <div className="grid gap-4">
                     {loading ? renderSkeleton() : servers.map((server, i) => (
                         <ServerDetailsCard
-                            id={`${server.deployment_name}_${i}`}
+                            key={`${server.deployment_name}_${i}`}
                             serverData={server}
                             onEdit={(server) => onEdit(server)}
                             onAction={(state) => onAction(server, state)}

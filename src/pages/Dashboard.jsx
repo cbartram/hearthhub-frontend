@@ -19,6 +19,9 @@ const Dashboard = () => {
     const kubeApi = new KubeApiClient(user);
 
     const [resourceMetrics, setResourceMetrics] = useState([])
+
+    // TODO Set cpu and mem limit on the user's account rather than from the server
+    // this will let us add plans which increase cpu/mem limit for servers
     const [cpuLimit, setCpuLimit] = useState(2)
     const [memLimit, setMemLimit] = useState(6)
     const [activeView, setActiveView] = useState('servers');
@@ -68,10 +71,6 @@ const Dashboard = () => {
                             })
                             return []
                         }),
-
-
-                    // TODO We make 2 separate API requests for listing mods and backups. Just return all the files for a user in this structure
-                    // { mods: [...], backups: [...] }
                     kubeApi.listFiles()
                         .then(res => {
                             const backups = []

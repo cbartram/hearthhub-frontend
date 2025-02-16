@@ -14,6 +14,8 @@ import {
 
 // @ts-ignore
 import DangerDialogue from '@/components/DangerDialogue.jsx'
+// @ts-ignore
+import ValheimWorldUpload from '@/components/ValheimWorldUpload.jsx'
 
 type Backup = {
     key: string;
@@ -71,51 +73,6 @@ const extractTimestamp = (key: string): string | null => {
     return match ? formatTimestamp(match[1]) : null;
 };
 
-const formatTimestamp = (timestamp: string): string => {
-    const year = timestamp.slice(0, 4);
-    const month = timestamp.slice(4, 6);
-    const day = timestamp.slice(6, 8);
-    const hours = timestamp.slice(8, 10);
-    const minutes = timestamp.slice(10, 12);
-
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-};
-
-const renderBadge = (backup: Backup) => {
-    if(backup.installed) {
-        return <Badge className="bg-green-200 text-green-800 hover:bg-green-300 ml-2">Installed</Badge>
-    }
-
-    return <Badge className="bg-red-200 text-red-800 hover:bg-red-300 ml-2">Not Installed</Badge>
-}
-
-const renderButtons = (backup: Backup, onBackupAction: Function) => {
-    if(backup.installing && !backup.installed) {
-        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
-            Installing...
-            <LoaderCircle className="ml-2 animate-spin" />
-        </Button>
-    } else if(backup.installing && backup.installed) {
-        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
-            Uninstalling...
-            <LoaderCircle className="ml-2 animate-spin" />
-        </Button>
-    }
-
-    if(!backup.installing && !backup.installed) {
-        return <Button className="bg-green-200 text-green-800 hover:bg-green-300 hover:border-green-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('install', backup)}>
-            <Download />
-            Install
-        </Button>
-    }
-
-    return <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('uninstall', backup)}>
-        <Trash />
-        Uninstall
-    </Button>
-}
-
-
 const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, servers, onBackupAction, onBackupRestore}) => {
     const [activeTab, setActiveTab] = useState<'primary' | 'replica'>('primary');
 
@@ -164,99 +121,147 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
     }
 
     return (
-        <Card className="m-6">
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <CardTitle className="text-2xl">Valheim Worlds</CardTitle>
-                    <div>
-                        <Button
-                            variant={activeTab === 'primary' ? 'default' : 'outline'}
-                            onClick={() => setActiveTab('primary')}
-                            className="mr-2 border-0 focus:outline-none focus:border-none"
-                        >
-                            <Globe2 className="mr-2 h-4 w-4" /> Worlds
-                        </Button>
-                        <Button
-                            variant={activeTab === 'replica' ? 'default' : 'outline'}
-                            onClick={() => setActiveTab('replica')}
-                            className="border-0 focus:outline-none focus:border-none"
-                        >
-                            <DatabaseBackup className="mr-2 h-4 w-4" /> World Backups
-                        </Button>
+        <div>
+            <Card className="m-6">
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <CardTitle className="text-2xl">Valheim Worlds</CardTitle>
+                        <div>
+                            <Button
+                                variant={activeTab === 'primary' ? 'default' : 'outline'}
+                                onClick={() => setActiveTab('primary')}
+                                className="mr-2 border-0 focus:outline-none focus:border-none"
+                            >
+                                <Globe2 className="mr-2 h-4 w-4" /> Worlds
+                            </Button>
+                            <Button
+                                variant={activeTab === 'replica' ? 'default' : 'outline'}
+                                onClick={() => setActiveTab('replica')}
+                                className="border-0 focus:outline-none focus:border-none"
+                            >
+                                <DatabaseBackup className="mr-2 h-4 w-4" /> World Backups
+                            </Button>
+                        </div>
                     </div>
-                </div>
-            </CardHeader>
-            <CardContent>
-                {activeTab === 'primary' && (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>World File</TableHead>
-                                <TableHead>Server State</TableHead>
-                                <TableHead className="text-right">Size</TableHead>
-                                <TableHead className="text-right">Install World</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {primaryBackups.map((backup) => (
-                                <TableRow key={backup.key}>
-                                    <TableCell className="font-medium">
-                                        {backup.key.split('/').pop()}
-                                        {renderBadge(backup)}
-                                    </TableCell>
-                                    <TableCell>
-                                        {
-                                            renderCurrentWorld(backup)
-                                        }
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {formatFileSize(backup.fileSize)}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {
-                                            renderButtons(backup, onBackupAction)
-                                        }
-                                    </TableCell>
+                </CardHeader>
+                <CardContent>
+                    {activeTab === 'primary' && (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>World File</TableHead>
+                                    <TableHead>Server State</TableHead>
+                                    <TableHead className="text-right">Size</TableHead>
+                                    <TableHead className="text-right">Install World</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
+                            </TableHeader>
+                            <TableBody>
+                                {primaryBackups.map((backup) => (
+                                    <TableRow key={backup.key}>
+                                        <TableCell className="font-medium">
+                                            {backup.key.split('/').pop()}
+                                            {renderBadge(backup)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {
+                                                renderCurrentWorld(backup)
+                                            }
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {formatFileSize(backup.fileSize)}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {
+                                                renderButtons(backup, onBackupAction)
+                                            }
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
 
-                {activeTab === 'replica' && (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Backup File</TableHead>
-                                <TableHead>Restore Backup (overwrite world)</TableHead>
-                                <TableHead>Timestamp</TableHead>
-                                <TableHead className="text-right">Size</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {replicaBackups.map((backup) => (
-                                <TableRow key={backup.key}>
-                                    <TableCell className="font-medium">
-                                        {backup.key.split('/').pop()}
-                                        <Badge variant="outline" className="ml-2">Replica</Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        { getRestoreButton(backup) }
-                                    </TableCell>
-                                    <TableCell>
-                                        {extractTimestamp(backup.key) || 'Unknown'}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {formatFileSize(backup.fileSize)}
-                                    </TableCell>
+                    {activeTab === 'replica' && (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Backup File</TableHead>
+                                    <TableHead>Restore Backup (overwrite world)</TableHead>
+                                    <TableHead>Timestamp</TableHead>
+                                    <TableHead className="text-right">Size</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
-            </CardContent>
-        </Card>
-    );
+                            </TableHeader>
+                            <TableBody>
+                                {replicaBackups.map((backup) => (
+                                    <TableRow key={backup.key}>
+                                        <TableCell className="font-medium">
+                                            {backup.key.split('/').pop()}
+                                            <Badge variant="outline" className="ml-2">Replica</Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            { getRestoreButton(backup) }
+                                        </TableCell>
+                                        <TableCell>
+                                            {extractTimestamp(backup.key) || 'Unknown'}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {formatFileSize(backup.fileSize)}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
+                </CardContent>
+            </Card>
+            <ValheimWorldUpload />
+        </div>
+    )
 };
+
+const formatTimestamp = (timestamp: string): string => {
+    const year = timestamp.slice(0, 4);
+    const month = timestamp.slice(4, 6);
+    const day = timestamp.slice(6, 8);
+    const hours = timestamp.slice(8, 10);
+    const minutes = timestamp.slice(10, 12);
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
+const renderBadge = (backup: Backup) => {
+    if(backup.installed) {
+        return <Badge className="bg-green-200 text-green-800 hover:bg-green-300 ml-2">Installed</Badge>
+    }
+
+    return <Badge className="bg-red-200 text-red-800 hover:bg-red-300 ml-2">Not Installed</Badge>
+}
+
+
+const renderButtons = (backup: Backup, onBackupAction: Function) => {
+    if(backup.installing && !backup.installed) {
+        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
+            Installing...
+            <LoaderCircle className="ml-2 animate-spin" />
+        </Button>
+    } else if(backup.installing && backup.installed) {
+        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
+            Uninstalling...
+            <LoaderCircle className="ml-2 animate-spin" />
+        </Button>
+    }
+
+    if(!backup.installing && !backup.installed) {
+        return <Button className="bg-green-200 text-green-800 hover:bg-green-300 hover:border-green-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('install', backup)}>
+            <Download />
+            Install
+        </Button>
+    }
+
+    return <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('uninstall', backup)}>
+        <Trash />
+        Uninstall
+    </Button>
+}
 
 export default BackupList
