@@ -18,48 +18,49 @@ import DangerDialogue from '@/components/DangerDialogue.jsx'
 import ValheimWorldUpload from '@/components/ValheimWorldUpload.jsx'
 
 type Backup = {
-    key: string;
-    fileSize: number;
-    installing: boolean;
-    installed: boolean;
+    key: string
+    fileSize: number
+    installing: boolean
+    installed: boolean
 };
 
 type Server = {
-    server_ip: string;
-    server_port: number;
-    deployment_name: string;
-    mod_pvc_name: string;
-    state: string;
+    server_ip: string
+    server_port: number
+    deployment_name: string
+    mod_pvc_name: string
+    state: string
     world_details: WorldDetails
 }
 
 type Modifier = {
-    key: string;
-    value: string;
+    key: string
+    value: string
 }
 
 type WorldDetails = {
-    name: string;
-    world: string;
-    port: string;
-    password: string;
-    enable_crossplay: boolean;
-    public: boolean;
-    instance_id: string;
+    name: string
+    world: string
+    port: string
+    password: string
+    enable_crossplay: boolean
+    public: boolean
+    instance_id: string
     modifiers: Modifier[]
-    save_interval_seconds: number;
-    backup_count: number;
-    initial_backup_seconds: number;
-    backup_interval_seconds: number;
+    save_interval_seconds: number
+    backup_count: number
+    initial_backup_seconds: number
+    backup_interval_seconds: number
 }
 
 
 type BackupListProps = {
-    primaryBackups: Backup[];
-    replicaBackups: Backup[];
-    onBackupAction: Function;
-    onBackupRestore: Function;
-    servers: Server[];
+    primaryBackups: Backup[]
+    replicaBackups: Backup[]
+    onBackupAction: Function
+    onBackupRestore: Function
+    onUploadComplete: Function
+    servers: Server[]
 };
 
 const formatFileSize = (sizeInBytes: number): string => {
@@ -73,7 +74,7 @@ const extractTimestamp = (key: string): string | null => {
     return match ? formatTimestamp(match[1]) : null;
 };
 
-const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, servers, onBackupAction, onBackupRestore}) => {
+const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, servers, onBackupAction, onBackupRestore, onUploadComplete}) => {
     const [activeTab, setActiveTab] = useState<'primary' | 'replica'>('primary');
 
     const getRestoreButton = (backup: Backup) => {
@@ -214,7 +215,8 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                     )}
                 </CardContent>
             </Card>
-            <ValheimWorldUpload />
+            <ValheimWorldUpload onUploadComplete={(file: Backup) => onUploadComplete(file)}
+            />
         </div>
     )
 };

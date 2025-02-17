@@ -89,6 +89,15 @@ class KubeApiClient extends ApiClient {
         });
     }
 
+    async generatePresignedUrls(files) {
+        return this.request("/api/v1/file/generate-signed-url", {
+            method: 'POST',
+            body: JSON.stringify({
+                files
+            }),
+        })
+    }
+
     async createServer(serverConfig) {
         return this.request('/api/v1/server/create', {
             method: 'POST',

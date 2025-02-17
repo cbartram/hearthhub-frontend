@@ -2,16 +2,19 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload } from 'lucide-react';
+import { Progress } from "@/components/ui/progress"
+import {LoaderCircle, Upload} from 'lucide-react';
 import {KubeApiClient} from "@/lib/api.js";
 import {useAuth} from "@/context/AuthContext.jsx";
 
 const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB in bytes
-const ValheimWorldUpload = () => {
+const ValheimWorldUpload = ({ onUploadComplete }) => {
     const {user} = useAuth()
     const [seedFile, setSeedFile] = useState(null);
     const [worldFile, setWorldFile] = useState(null);
     const [error, setError] = useState('');
+    const [seedUploadProgress, setSeedUploadProgress] = useState(0);
+    const [worldUploadProgress, setWorldUploadProgress] = useState(0);
     const [uploading, setUploading] = useState(false);
     const apiClient = new KubeApiClient(user)
 
@@ -46,6 +49,12 @@ const ValheimWorldUpload = () => {
             return;
         }
 
+        // Backups are hard to deal with because there would have to be additional logic on the backend which
+        // parses and renames the backup file to the actual world name its being uploaded against.
+        if (validateFileName(file.name)) {
+            setError('You cannot use a backup as a new world.');
+            return;
+        }
 
         const sizeError = validateFileSize(file);
         if (sizeError) {
@@ -103,27 +112,41 @@ const ValheimWorldUpload = () => {
         setUploading(true);
         setError('');
 
-        const formData = new FormData();
-        formData.append('seed_file', seedFile);
-        formData.append('world_file', worldFile);
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
         try {
-            await apiClient.request("/api/v1/file/upload", {
-                method: 'POST',
-                body: formData,
-                signal: controller.signal,
-                headers: {
-                    'Accept': 'application/json',
-                    // 'Cache-Control': 'no-cache',
-                    // 'Pragma': 'no-cache',
-                },
-                // keepalive: false,
-            })
+            const body = [seedFile, worldFile].map(f => ({
+                name: f.name,
+                size: f.size,
+            }))
 
-            clearTimeout(timeoutId)
+            const res = await apiClient.generatePresignedUrls(body)
+
+            await Promise.all([
+                fetch(res.urls[seedFile.name], {
+                    method: 'PUT',
+                    body: seedFile,
+                    onUploadProgress: (progressEvent) => {
+                        const progress = (progressEvent.loaded / progressEvent.total) * 100;
+                        setSeedUploadProgress(progress);
+                    },
+                }),
+                fetch(res.urls[worldFile.name], {
+                    method: 'PUT',
+                    body: worldFile,
+                    onUploadProgress: (progressEvent) => {
+                        const progress = (progressEvent.loaded / progressEvent.total) * 100;
+                        setWorldUploadProgress(progress);
+                    },
+                })
+            ])
+
+            setSeedFile(null)
+            setWorldFile(null)
+            onUploadComplete({
+                key: `valheim-backups-auto/${user.discordId}/${worldFile.name}`,
+                fileSize: worldFile.size,
+                installed: false,
+                installing: false
+            })
         } catch (err) {
             setError('Failed to upload files: ' + err.message);
         } finally {
@@ -163,6 +186,9 @@ const ValheimWorldUpload = () => {
                             Selected: {seedFile.name} ({formatFileSize(seedFile.size)})
                         </p>
                     )}
+                    {seedUploadProgress > 0 && (
+                        <Progress value={seedUploadProgress} className="w-full" />
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -181,7 +207,11 @@ const ValheimWorldUpload = () => {
                             Selected: {worldFile.name} ({formatFileSize(worldFile.size)})
                         </p>
                     )}
+                    {worldUploadProgress > 0 && (
+                        <Progress value={worldUploadProgress} className="w-full" />
+                    )}
                 </div>
+
 
                 {error && (
                     <Alert variant="destructive">
@@ -195,7 +225,7 @@ const ValheimWorldUpload = () => {
                     className="w-full"
                 >
                     <Upload className="mr-2 h-4 w-4" />
-                    {uploading ? 'Uploading...' : 'Upload Files'}
+                    {uploading ? <>Uploading... <LoaderCircle className="animate-spin"/></> : 'Upload Files'}
                 </Button>
             </CardContent>
         </Card>

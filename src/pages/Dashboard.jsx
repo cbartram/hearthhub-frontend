@@ -598,6 +598,7 @@ const Dashboard = () => {
                     servers={servers}
                     onBackupRestore={(server, backup) => handleRestoreBackup(server, backup)}
                     onBackupAction={(action, backup) => handleBackupAction(action, backup)}
+                    onUploadComplete={(file) => setPrimaryBackups([...primaryBackups, file])}
                 />
             default:
                 return serverList
