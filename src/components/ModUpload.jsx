@@ -100,7 +100,7 @@ const ModUpload = ({ onUploadComplete }) => {
                     <br />
                     <br />
                     Mod files must have the dll, configuration, or any required files for the mod in the root of the zip.
-                    I.e: Highlight the mod files  > "Compress To" > "Zip File"
+                    I.e: Highlight the mod files -- "Compress To" -- "Zip File"
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

@@ -4,6 +4,7 @@ import ServerDetailsCard from "@/components/ServerDetailsCard.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
 import ResourceMetrics from "@/components/ResourceMetrics";
+import ServerLogs from "@/components/ServerLogs";
 
 
 export const renderSkeleton = () => {
@@ -59,8 +60,7 @@ export const renderSkeleton = () => {
     );
 };
 
-
-const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, onEdit, metrics }) => {
+const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, onEdit, metrics, logs }) => {
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-6">Your Valheim Servers</h2>
@@ -72,17 +72,21 @@ const ServersList = ({ servers, loading, onServerCreateButtonClick, onAction, on
                     </Button>
                 </div>
             ) : (
-                <div className="grid gap-4">
-                    {loading ? renderSkeleton() : servers.map((server, i) => (
-                        <ServerDetailsCard
-                            key={`${server.deployment_name}_${i}`}
-                            serverData={server}
-                            onEdit={(server) => onEdit(server)}
-                            onAction={(state) => onAction(server, state)}
-                        />
-                    ))}
-                    <ResourceMetrics data={metrics} />
-                </div>
+                <>
+                    <div className="space-y-4">
+                        {loading ? renderSkeleton() : servers.map((server, i) => (
+                            <div key={`${server.deployment_name}_${i}`} className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                                <ServerDetailsCard
+                                    serverData={server}
+                                    onEdit={(server) => onEdit(server)}
+                                    onAction={(state) => onAction(server, state)}
+                                />
+                                <ServerLogs logs={logs} />
+                            </div>
+                        ))}
+                        <ResourceMetrics data={metrics} />
+                    </div>
+                </>
             )}
         </div>
     );

@@ -26,6 +26,7 @@ const Dashboard = () => {
     const [memLimit, setMemLimit] = useState(6)
     const [activeView, setActiveView] = useState('servers');
     const [serversLoading, setServersLoading] = useState(true)
+    const [logs, setLogs] = useState([])
     const [servers, setServers] = useState([])
     const [mods, setMods] = useState([]);
     const [primaryBackups, setPrimaryBackups] = useState([])
@@ -49,7 +50,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [server, mods] = await Promise.all([
+                await Promise.all([
                     kubeApi.getServers()
                         .then(s => {
                             setServers([
@@ -205,6 +206,9 @@ const Dashboard = () => {
             console.log('ws message:', message)
         }
         switch (message.type) {
+            case "Logs":
+                setLogs(prevLogs => [...prevLogs, ...content.logs])
+                break;
             case "JoinCode":
                 setServers(prevServers =>
                     prevServers.map(serv => {
@@ -273,6 +277,9 @@ const Dashboard = () => {
     // WebSocket setup
     useEffect(() => {
         const ws = new WebSocket(`${isProd() ? K8S_BASE_URL : "http://localhost:8080"}/api/v1/ws?id=${user.discordId}`);
+
+        // To use the local ws-server instead of the local hearthhub-kube-server websockets uncomment
+        // const ws = new WebSocket("ws://localhost:8888")
 
         ws.addEventListener('message', handleWebSocketMessage);
         ws.addEventListener('error', (event) => {
@@ -549,6 +556,7 @@ const Dashboard = () => {
 
     const renderViews = () => {
         const serverList = <ServersList
+            logs={logs}
             metrics={resourceMetrics}
             onAction={(server, state) => handleServerAction(server, state)}
             loading={serversLoading}
