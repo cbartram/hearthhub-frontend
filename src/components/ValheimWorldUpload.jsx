@@ -116,6 +116,7 @@ const ValheimWorldUpload = ({ onUploadComplete }) => {
             const body = [seedFile, worldFile].map(f => ({
                 name: f.name,
                 size: f.size,
+                prefix: `valheim-backups-auto/${user.discordId}/${f.name}`
             }))
 
             const res = await apiClient.generatePresignedUrls(body)

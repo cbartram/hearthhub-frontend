@@ -590,6 +590,7 @@ const Dashboard = () => {
                 return <ModInstall
                     mods={mods}
                     handleModToggle={(id) => handleModToggle(id)}
+                    onUploadComplete={(file) => setMods([...mods, file])}
                 />
             case "backups":
                 return <BackupsList

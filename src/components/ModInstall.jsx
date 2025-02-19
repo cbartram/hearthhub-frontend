@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import {Search, Download, LoaderCircle} from 'lucide-react';
 import {Badge} from "@/components/ui/badge";
+import ModUpload from "@/components/ModUpload";
 
 
-const ModInstall = ({mods, handleModToggle}) => {
+const ModInstall = ({mods, handleModToggle, onUploadComplete }) => {
     const [shownMods, setShownMods] = useState(mods)
 
     const onSearch = (val) => {
@@ -90,6 +91,7 @@ const ModInstall = ({mods, handleModToggle}) => {
                     </div>
                 </CardContent>
             </Card>
+            <ModUpload onUploadComplete={(f) => onUploadComplete(f)} />
         </div>
     )
 }
