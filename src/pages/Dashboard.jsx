@@ -11,6 +11,7 @@ import BackupsList from "@/components/BackupsList";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
 import {isProd, K8S_BASE_URL} from "@/lib/constants";
+import ConfigViewer from "@/components/ConfigViewer.jsx";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
@@ -31,6 +32,7 @@ const Dashboard = () => {
     const [mods, setMods] = useState([]);
     const [primaryBackups, setPrimaryBackups] = useState([])
     const [replicaBackups, setReplicaBackups] = useState([])
+    const [configs, setConfigs] = useState([])
     const [editedServer, setEditedServer] = useState({})
     const [errorDialogue, setErrorDialogue] = useState({
         visible: false,
@@ -77,6 +79,21 @@ const Dashboard = () => {
                             const backups = []
                             const replicas = []
                             const backupKeys = {}
+
+                            // TODO Merge install status with user data once it's in cognito
+                            setConfigs([
+                                ...res.configs.map((config, i) => {
+                                    const name = config.key.split("/")[config.key.split("/").length - 1]
+                                    return {
+                                        name,
+                                        content: '',
+                                        key: config.key,
+                                        size: config.fileSize,
+                                        installed: false,
+                                        installing: false,
+                                    }
+                                })
+                            ])
 
                             // Re-map mods
                             setMods([
@@ -251,6 +268,8 @@ const Dashboard = () => {
                                 : m
                         )
                     );
+
+                    setConfigs(prevConfigs => prevConfigs.map(c => c.installing ? {...c, installing: false, installed: content.operation === "write" } : c))
 
                     setPrimaryBackups((prevBackups) =>
                         prevBackups.map((b) =>
@@ -554,6 +573,35 @@ const Dashboard = () => {
         })
     }
 
+    const handleConfigFileInstall = async (file) => {
+        setConfigs([
+            ...configs.map(c => {
+                if(c.key === file.key) {
+                    return {
+                        ...c,
+                        installing: true,
+                    }
+                }
+                return c
+            })
+        ])
+
+        try {
+           await kubeApi.installFile({
+                archive: false,
+                prefix: file.key,
+                destination: `/valheim/BepInEx/config`,
+                operation: "write"
+            })
+        } catch (err) {
+            setErrorDialogue({
+                visible: true,
+                title: 'Error Installing Config File',
+                message: 'Failed to install config file. Details: ' + err.message
+            });
+        }
+    }
+
     const renderViews = () => {
         const serverList = <ServersList
             logs={logs}
@@ -608,6 +656,12 @@ const Dashboard = () => {
                     onBackupRestore={(server, backup) => handleRestoreBackup(server, backup)}
                     onBackupAction={(action, backup) => handleBackupAction(action, backup)}
                     onUploadComplete={(file) => setPrimaryBackups([...primaryBackups, file])}
+                />
+            case "configuration":
+                return <ConfigViewer
+                    configs={configs}
+                    onUploadComplete={(file) => setConfigs([...configs, file])}
+                    onConfigFileInstall={(file) => handleConfigFileInstall(file)}
                 />
             default:
                 return serverList

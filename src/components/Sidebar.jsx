@@ -3,7 +3,7 @@ import {
     Home,
     PlusCircle,
     Puzzle,
-    Globe2
+    Globe2, Cog
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import HearthHubLogo from "@/assets/hearthhub_logo.png";
@@ -30,6 +30,11 @@ const Sidebar = ({ activeView, onViewChange, skeleton }) => {
             icon: <Globe2 />,
             label: 'Worlds',
             view: 'backups'
+        },
+        {
+            icon: <Cog />,
+            label: 'Configuration',
+            view: 'configuration'
         }
     ];
 
