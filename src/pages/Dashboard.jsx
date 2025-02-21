@@ -82,8 +82,21 @@ const Dashboard = () => {
 
                             // TODO Merge install status with user data once it's in cognito
                             setConfigs([
-                                ...res.configs.map((config, i) => {
+                                ...res.configs.map(config => {
                                     const name = config.key.split("/")[config.key.split("/").length - 1]
+                                    for(const installedConfigFile in user.installedConfig) {
+                                        if(name === installedConfigFile) {
+                                            return {
+                                                name,
+                                                content: '',
+                                                key: config.key,
+                                                size: config.fileSize,
+                                                installed: true,
+                                                installing: false,
+                                            }
+                                        }
+                                    }
+
                                     return {
                                         name,
                                         content: '',

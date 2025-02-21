@@ -12,7 +12,6 @@ const MAX_FILE_SIZE = 30 * 1024 * 1024
 
 const ConfigViewer = ({ configs, onUploadComplete, onConfigFileInstall }) => {
     const {user} = useAuth()
-    const [selectedConfig, setSelectedConfig] = useState(null);
     const [configFile, setConfigFile] = useState(null);
     const [error, setError] = useState('');
     const [uploading, setUploading] = useState(false);
@@ -133,7 +132,6 @@ const ConfigViewer = ({ configs, onUploadComplete, onConfigFileInstall }) => {
                                 <TableRow
                                     key={config.key}
                                     className="cursor-pointer hover:bg-gray-100"
-                                    onClick={() => setSelectedConfig(config)}
                                 >
                                     <TableCell className="font-medium">
                                         {config.name.split('/').pop()}
@@ -199,19 +197,6 @@ const ConfigViewer = ({ configs, onUploadComplete, onConfigFileInstall }) => {
                     </Button>
                 </CardContent>
             </Card>
-
-            {selectedConfig && (
-                <Card className="m-6">
-                    <CardHeader>
-                        <CardTitle>Configuration Content</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto max-h-96 font-mono text-sm">
-                          {selectedConfig.content}
-                        </pre>
-                    </CardContent>
-                </Card>
-            )}
         </div>
     );
 };
