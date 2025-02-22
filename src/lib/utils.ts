@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import {K8S_BASE_URL} from "@/lib/constants.ts";
+import {isProd, K8S_BASE_URL} from "@/lib/constants.ts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -34,6 +34,13 @@ export function formatBytes(bytes: number): string {
   }
 }
 
+export const discordRedirect = () => {
+  if(isProd()) {
+    window.location.href = "https://discord.com/oauth2/authorize?client_id=1330916460343857184&response_type=code&redirect_uri=https%3A%2F%2Fhearthhub.duckdns.org%2Fdiscord%2Foauth&scope=identify+email"
+  } else {
+    window.location.href = "https://discord.com/oauth2/authorize?client_id=1330916460343857184&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fdiscord%2Foauth&scope=email+identify"
+  }
+}
 
 /**
  * Creates a new user in Cognito. If the user already exists it will be returned instead.

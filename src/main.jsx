@@ -1,13 +1,13 @@
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from '@/context/AuthContext.jsx';
+import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import AuthCallback from "@/components/AuthCallback.jsx";
-import Login from '@/pages/Login.tsx'
-import Dashboard from '@/pages/Dashboard.jsx'
+import AuthCallback from "@/components/AuthCallback";
+import Login from '@/pages/Login'
+import Dashboard from '@/pages/Dashboard'
+import Landing from "@/pages/Landing";
 
 import { RedirectIfAuthenticated } from '@/components/RedirectIfAuthenticated'
-
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
@@ -18,7 +18,7 @@ createRoot(document.getElementById('root')).render(
                     path="/"
                     element={
                         <RedirectIfAuthenticated>
-                            <Login />
+                            <Landing />
                         </RedirectIfAuthenticated>
                     }
                 />
