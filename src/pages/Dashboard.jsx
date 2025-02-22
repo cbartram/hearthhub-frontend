@@ -80,7 +80,6 @@ const Dashboard = () => {
                             const replicas = []
                             const backupKeys = {}
 
-                            // TODO Merge install status with user data once it's in cognito
                             setConfigs([
                                 ...res.configs.map(config => {
                                     const name = config.key.split("/")[config.key.split("/").length - 1]
@@ -91,6 +90,7 @@ const Dashboard = () => {
                                                 content: '',
                                                 key: config.key,
                                                 size: config.fileSize,
+                                                updated: false,
                                                 installed: true,
                                                 installing: false,
                                             }
@@ -102,6 +102,7 @@ const Dashboard = () => {
                                         content: '',
                                         key: config.key,
                                         size: config.fileSize,
+                                        updated: false,
                                         installed: false,
                                         installing: false,
                                     }
@@ -673,7 +674,20 @@ const Dashboard = () => {
             case "configuration":
                 return <ConfigViewer
                     configs={configs}
-                    onUploadComplete={(file) => setConfigs([...configs, file])}
+                    onUploadComplete={(file) => {
+                        const existingConfig = configs.find(config => config.name === file.name);
+
+                        if (existingConfig) {
+                            const updatedConfigs = configs.map(config =>
+                                config.name === file.name
+                                    ? { ...config, updated: true }
+                                    : config
+                            );
+                            setConfigs(updatedConfigs);
+                        } else {
+                            setConfigs([...configs, file]);
+                        }
+                    }}
                     onConfigFileInstall={(file) => handleConfigFileInstall(file)}
                 />
             default:

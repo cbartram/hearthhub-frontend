@@ -1,4 +1,3 @@
-
 name: hearthhub-frontend
 namespace: hearthhub
 serviceAccountName: hearthhub-api-sa
@@ -6,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: cbartram/hearthhub-frontend
-  tag: "0.0.15"
+  tag: "0.0.17"
 
 service:
   type: ClusterIP
@@ -37,15 +36,8 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
 
 volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
 
 volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
 
 nodeSelector: {}
 tolerations: []

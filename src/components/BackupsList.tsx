@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DatabaseBackup, Download, Globe2, LoaderCircle, Trash} from 'lucide-react';
+import {DatabaseBackup, Download, Globe2, Info, LoaderCircle, Trash} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -11,6 +11,11 @@ import {
     TableHeader,
     TableRow
 } from '@/components/ui/table';
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 // @ts-ignore
 import DangerDialogue from '@/components/DangerDialogue.jsx'
@@ -97,7 +102,30 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
             return <Button className="bg-green-100 text-green-800 hover:bg-green-200 text-md hover:border-1 hover:border-green-100 hover:outline-none" onClick={() => onBackupRestore(server, backup)}>Restore Backup</Button>
         }
 
-        return <Button disabled className="bg-gray-300 text-gray-900 hover:bg-gray-400 hover:border-1 hover:border-gray-400 hover:outline-none text-md">No Server</Button>
+        return (
+        <HoverCard>
+            <HoverCardTrigger asChild>
+                <Button disabled className="bg-gray-200 text-gray-900 hover:bg-gray-300 hover:border-1 hover:border-gray-300 hover:outline-none text-md">No Server</Button>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+                <div className="flex justify-between space-x-4">
+                    <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                            <Info />
+                            <h4 className="text-sm font-semibold">Info</h4>
+                        </div>
+                        <p className="text-sm">
+                            You need to install the world file: {backupName}, edit your server, select "Use existing world", choose {backupName}, save, and
+                            start your server to restore backups for {backupName}
+                        </p>
+                        <div className="flex items-center pt-2">
+                            <span className="text-xs text-muted-foreground">{backupName} has no active server.</span>
+                        </div>
+                    </div>
+                </div>
+            </HoverCardContent>
+        </HoverCard>
+        )
     }
 
     const renderCurrentWorld = (backup: Backup) => {
@@ -118,7 +146,28 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
             }
         }
 
-        return <Badge className="bg-gray-200 text-gray-800 hover:bg-gray-400 text-md">No Server</Badge>
+        return <HoverCard>
+            <HoverCardTrigger asChild>
+                <Button className="bg-gray-200 py-1 px-2 text-gray-900 hover:bg-gray-300 hover:border-1 hover:border-gray-300 hover:outline-none text-sm">No Server</Button>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+                <div className="flex justify-between space-x-4">
+                    <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                            <Info />
+                            <h4 className="text-sm font-semibold">Info</h4>
+                        </div>
+                        <p className="text-sm">
+                            You need to install {backupName}, edit your server, select "Use existing world", choose {backupName}, save, and
+                            start your server to restore backups for {backupName}
+                        </p>
+                        <div className="flex items-center pt-2">
+                            <span className="text-xs text-muted-foreground">{backupName} has no active server.</span>
+                        </div>
+                    </div>
+                </div>
+            </HoverCardContent>
+        </HoverCard>
     }
 
     return (

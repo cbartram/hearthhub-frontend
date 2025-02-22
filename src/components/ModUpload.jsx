@@ -99,8 +99,8 @@ const ModUpload = ({ onUploadComplete }) => {
                     Maximum file size: {formatFileSize(MAX_FILE_SIZE)}
                     <br />
                     <br />
-                    Mod files must have the dll, configuration, or any required files for the mod in the root of the zip.
-                    I.e: Highlight the mod files -- "Compress To" -- "Zip File"
+                    Mod files must have the dll, configuration, and any required files for the mod in the root of the zip.
+                    I.e: Highlight the mod files, "Compress To", "Zip File", and upload the zip.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

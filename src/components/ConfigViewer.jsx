@@ -73,6 +73,7 @@ const ConfigViewer = ({ configs, onUploadComplete, onConfigFileInstall }) => {
                 name: configFile.name,
                 content: 'TODO',
                 size: configFile.size,
+                updated: false,
                 installed: false,
                 installing: false
             })
@@ -103,9 +104,12 @@ const ConfigViewer = ({ configs, onUploadComplete, onConfigFileInstall }) => {
             </Button>
         }
 
-        if(!configFile.installed) {
-            return <Button
-                className="bg-green-100 text-green-800 hover:bg-green-200 text-md hover:border-1 hover:border-green-100 hover:outline-none" onClick={() => onConfigFileInstall(configFile)}>Install File</Button>
+        if(!configFile.installed || configFile.updated) {
+            return (
+                <Button className="bg-green-100 text-green-800 hover:bg-green-200 text-md hover:border-1 hover:border-green-100 hover:outline-none" onClick={() => onConfigFileInstall(configFile)}>
+                    {configFile.updated ? 'Re-install File' : 'Install File'}
+                </Button>
+            )
         }
 
         return <Button disabled className="bg-gray-300 text-gray-900 hover:bg-gray-400 hover:border-1 hover:border-gray-400 hover:outline-none text-md">Installed</Button>
@@ -135,6 +139,7 @@ const ConfigViewer = ({ configs, onUploadComplete, onConfigFileInstall }) => {
                                 >
                                     <TableCell className="font-medium">
                                         {config.name.split('/').pop()}
+                                        {config.updated && <Badge className="ml-2 bg-green-100 text-green-800 hover:bg-green-200 text-md hover:border-1 hover:border-green-100 hover:outline-none">Updated</Badge>}
                                     </TableCell>
                                     <TableCell className="font-medium">
                                         {renderBadge(config)}
