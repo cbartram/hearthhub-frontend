@@ -9,22 +9,53 @@ import {KubeApiClient} from "@/lib/api.js";
 import {formatBytes} from "@/lib/utils.ts";
 import BackupsList from "@/components/BackupsList";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
-import {AlertCircle} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {AlertCircle, Menu} from "lucide-react";
 import {isProd, K8S_BASE_URL} from "@/lib/constants";
 import ConfigViewer from "@/components/ConfigViewer.jsx";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
+
+/**
+ * Custom hook which maintains state around the windows size so Dashboard can adapt accordingly when the window size changes.
+ * @returns {{width: number, height: number}}
+ */
+function useWindowSize() {
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+
+    useEffect(() => {
+        function handleResize() {
+            setWindowSize({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return windowSize;
+}
+
+
+
 const Dashboard = () => {
     const {user, logout} = useAuth()
     const kubeApi = new KubeApiClient(user);
-
+    const { width } = useWindowSize();
     const [resourceMetrics, setResourceMetrics] = useState([])
-
     // TODO Set cpu and mem limit on the user's account rather than from the server
     // this will let us add plans which increase cpu/mem limit for servers
     const [cpuLimit, setCpuLimit] = useState(2)
     const [memLimit, setMemLimit] = useState(6)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeView, setActiveView] = useState('servers');
     const [serversLoading, setServersLoading] = useState(true)
     const [logs, setLogs] = useState([])
@@ -332,6 +363,14 @@ const Dashboard = () => {
         };
     }, [handleWebSocketMessage, user.discordId]);
 
+    useEffect(() => {
+        if (width >= 1024 && !isSidebarOpen) {
+            setIsSidebarOpen(true)
+        } else {
+            setIsSidebarOpen(false)
+        }
+    }, [width]);
+
     const updateServerState = (state, containerName) => {
         setServers(prevServers =>
             prevServers.map(serv => {
@@ -345,6 +384,7 @@ const Dashboard = () => {
             })
         );
     }
+
 
     /**
      * Converts a list of modifiers (needed to send a request to the server) into an object; required to prepopulate
@@ -696,23 +736,60 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="flex h-screen">
-            <Sidebar activeView={activeView} onViewChange={(v) => setActiveView(v)} />
-            <div className="flex-1 min-w-24">
-                <Navbar onLogout={logout} userId={user.discordId} avatarId={user.avatarId}/>
-                {
-                    errorDialogue.visible && (
-                        <Alert variant="destructive" className="m-6 max-w-3xl">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle>{errorDialogue.title}</AlertTitle>
-                            <AlertDescription>
-                                {errorDialogue.message}
-                            </AlertDescription>
-                        </Alert>
-                    )
-                }
-                {renderViews()}
+        <div className="relative min-h-screen">
+            {/* Mobile Menu Button - Only visible on small screens */}
+            <div className="lg:hidden fixed top-0 left-0 z-30 m-4">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                >
+                    <Menu className="h-4 w-4" />
+                </Button>
             </div>
+
+            <div className={`fixed inset-y-0 left-0 z-20 transform lg:relative lg:translate-x-0 lg:flex transition-transform duration-200 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <Sidebar
+                    activeView={activeView}
+                    onViewChange={(v) => {
+                        setActiveView(v);
+                        // setIsSidebarOpen(false);
+                    }}
+                />
+            </div>
+
+            <div className="flex-1 min-w-0 lg:ml-0">
+                <div className="pl-16 lg:pl-0">
+                    <Navbar
+                        onLogout={logout}
+                        userId={user.discordId}
+                        avatarId={user.avatarId}
+                    />
+                </div>
+
+                {/* Error Dialog */}
+                {errorDialogue.visible && (
+                    <Alert variant="destructive" className="mx-4 mt-16 lg:m-6 max-w-3xl">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>{errorDialogue.title}</AlertTitle>
+                        <AlertDescription>
+                            {errorDialogue.message}
+                        </AlertDescription>
+                    </Alert>
+                )}
+
+                <div className="p-4 lg:p-6">
+                    {renderViews()}
+                </div>
+            </div>
+
+            {/* Overlay for mobile sidebar */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/20 lg:hidden z-10"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
         </div>
     );
 };
