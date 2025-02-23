@@ -172,22 +172,22 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
 
     return (
         <div>
-            <Card className="m-6">
+            <Card className="m-2 sm:m-6">
                 <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="text-2xl">Valheim Worlds</CardTitle>
-                        <div>
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <CardTitle className="text-xl sm:text-2xl">Valheim Worlds</CardTitle>
+                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                             <Button
                                 variant={activeTab === 'primary' ? 'default' : 'outline'}
                                 onClick={() => setActiveTab('primary')}
-                                className="mr-2 border-0 focus:outline-none focus:border-none"
+                                className="w-full sm:w-auto border-0 focus:outline-none focus:border-none"
                             >
                                 <Globe2 className="mr-2 h-4 w-4" /> Worlds
                             </Button>
                             <Button
                                 variant={activeTab === 'replica' ? 'default' : 'outline'}
                                 onClick={() => setActiveTab('replica')}
-                                className="border-0 focus:outline-none focus:border-none"
+                                className="w-full sm:w-auto border-0 focus:outline-none focus:border-none"
                             >
                                 <DatabaseBackup className="mr-2 h-4 w-4" /> World Backups
                             </Button>
@@ -196,76 +196,69 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                 </CardHeader>
                 <CardContent>
                     {activeTab === 'primary' && (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>World File</TableHead>
-                                    <TableHead>Server State</TableHead>
-                                    <TableHead className="text-right">Size</TableHead>
-                                    <TableHead className="text-right">Install World</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {primaryBackups.map((backup) => (
-                                    <TableRow key={backup.key}>
-                                        <TableCell className="font-medium">
-                                            {backup.key.split('/').pop()}
-                                            {renderBadge(backup)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {
-                                                renderCurrentWorld(backup)
-                                            }
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            {formatFileSize(backup.fileSize)}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            {
-                                                renderButtons(backup, onBackupAction)
-                                            }
-                                        </TableCell>
+                        <div className="overflow-x-auto">
+                            <Table className="w-full">
+                                <TableHeader className="hidden sm:table-header-group"> {/* Hide header on mobile */}
+                                    <TableRow>
+                                        <TableHead>World File</TableHead>
+                                        <TableHead>Server State</TableHead>
+                                        <TableHead className="text-right">Size</TableHead>
+                                        <TableHead className="text-right">Install World</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {primaryBackups.map((backup) => (
+                                        <TableRow key={backup.key} className="flex flex-col sm:table-row mb-4 sm:mb-0">
+                                            <TableCell className="font-medium">
+                                                {backup.key.split('/').pop()}
+                                                {renderBadge(backup)}
+                                            </TableCell>
+                                            <TableCell>{renderCurrentWorld(backup)}</TableCell>
+                                            <TableCell className="text-right sm:text-left">
+                                                {formatFileSize(backup.fileSize)}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                {renderButtons(backup, onBackupAction)}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     )}
 
                     {activeTab === 'replica' && (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Backup File</TableHead>
-                                    <TableHead>Restore Backup (overwrite world)</TableHead>
-                                    <TableHead>Timestamp</TableHead>
-                                    <TableHead className="text-right">Size</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {replicaBackups.map((backup) => (
-                                    <TableRow key={backup.key}>
-                                        <TableCell className="font-medium">
-                                            {backup.key.split('/').pop()}
-                                            <Badge variant="outline" className="ml-2">Replica</Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            { getRestoreButton(backup) }
-                                        </TableCell>
-                                        <TableCell>
-                                            {extractTimestamp(backup.key) || 'Unknown'}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            {formatFileSize(backup.fileSize)}
-                                        </TableCell>
+                        <div className="overflow-x-auto">
+                            <Table className="w-full">
+                                <TableHeader className="hidden sm:table-header-group"> {/* Hide header on mobile */}
+                                    <TableRow>
+                                        <TableHead>Backup File</TableHead>
+                                        <TableHead>Restore Backup</TableHead>
+                                        <TableHead>Timestamp</TableHead>
+                                        <TableHead className="text-right">Size</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {replicaBackups.map((backup) => (
+                                        <TableRow key={backup.key} className="flex flex-col sm:table-row mb-4 sm:mb-0">
+                                            <TableCell className="font-medium">
+                                                {backup.key.split('/').pop()}
+                                                <Badge variant="outline" className="ml-2">Replica</Badge>
+                                            </TableCell>
+                                            <TableCell>{getRestoreButton(backup)}</TableCell>
+                                            <TableCell>{extractTimestamp(backup.key) || 'Unknown'}</TableCell>
+                                            <TableCell className="text-right sm:text-left">
+                                                {formatFileSize(backup.fileSize)}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     )}
                 </CardContent>
             </Card>
-            <ValheimWorldUpload onUploadComplete={(file: Backup) => onUploadComplete(file)}
-            />
+            <ValheimWorldUpload onUploadComplete={onUploadComplete} />
         </div>
     )
 };

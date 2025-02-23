@@ -156,7 +156,7 @@ const ValheimWorldUpload = ({ onUploadComplete }) => {
     };
 
     return (
-        <Card className="w-full max-w-2xl m-6">
+        <Card className="w-full max-w-2xl md:m-6 lg:m-6 sm:m-0">
             <CardHeader>
                 <CardTitle>Upload Valheim World</CardTitle>
                 <CardDescription>

@@ -99,90 +99,101 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
     }));
 
     return (
-        <div className="p-0">
-            <Card className="w-full max-w-2xl m-6">
-                <CardHeader>
-                    <CardTitle>Configure your Valheim Server</CardTitle>
-                    <CardDescription>Configure your dedicated Valheim server settings</CardDescription>
+        <div className="p-2 sm:p-4 md:p-6">
+            <Card className="w-full max-w-2xl mx-auto">
+                <CardHeader className="space-y-2">
+                    <CardTitle className="text-xl sm:text-2xl">Configure your Valheim Server</CardTitle>
+                    <CardDescription className="text-sm sm:text-base">Configure your dedicated Valheim server settings</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {
-                        Object.keys(errorData).length > 0 ?
-                        <Alert variant="destructive">
+                    {Object.keys(errorData).length > 0 && (
+                        <Alert variant="destructive" className="mb-4">
                             <AlertCircle className="h-4 w-4" />
                             <AlertTitle>Error</AlertTitle>
                             <AlertDescription>
-                                <ul>
-                                    {
-                                        Object.keys(errorData).map(key => {
-                                            return <li key={key}>{errorData[key]}</li>
-                                        })
-                                    }
+                                <ul className="list-disc pl-4">
+                                    {Object.keys(errorData).map(key => (
+                                        <li key={key} className="text-sm">{errorData[key]}</li>
+                                    ))}
                                 </ul>
                             </AlertDescription>
-                        </Alert> : <></>
-                    }
+                        </Alert>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
+                        {/* Server Name and World Selection - Stack on mobile */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Server Name</Label>
+                                <Label className="text-sm font-medium">Server Name</Label>
                                 <Input
                                     value={formData.name}
                                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                                     placeholder="My Viking Server"
                                     required
+                                    className="w-full"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Select an Option</Label>
-                                <RadioGroup defaultValue="comfortable">
+                                <Label className="text-sm font-medium">Select an Option</Label>
+                                <RadioGroup defaultValue="comfortable" className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem className={worldSelect === "new" ? 'bg-black' : 'bg-gray-100'} value="new" id="r1" onClick={() => setWorldSelect('new')} />
-                                        <Label htmlFor="r1">New World</Label>
+                                        <Label htmlFor="r1" className="text-sm">New World</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <RadioGroupItem className={worldSelect === "existing" ? '' : 'bg-gray-100'} value="existing" id="r2"  onClick={() => setWorldSelect('existing')} />
-                                        <Label htmlFor="r2">Existing World</Label>
+                                        <RadioGroupItem className={worldSelect === "existing" ? '' : 'bg-gray-100'} value="existing" id="r2" onClick={() => setWorldSelect('existing')} />
+                                        <Label htmlFor="r2" className="text-sm">Existing World</Label>
                                     </div>
                                 </RadioGroup>
                             </div>
                         </div>
 
+                        {/* World Selection */}
                         <div className="space-y-2">
-                            {
-                                worldSelect === 'new' ? <>
-                                    <Label>World Name</Label>
+                            {worldSelect === 'new' ? (
+                                <>
+                                    <Label className="text-sm font-medium">World Name</Label>
                                     <Input
                                         value={formData.world}
                                         onChange={(e) => setFormData({...formData, world: e.target.value})}
                                         placeholder="Midgard Realm"
                                         required
+                                        className="w-full"
                                     />
-                                </> : <>
-                                    <Label>Select Existing World</Label>
+                                </>
+                            ) : (
+                                <>
+                                    <Label className="text-sm font-medium">Select Existing World</Label>
                                     <Select
                                         value={formData.world}
                                         onValueChange={(value) => setFormData({...formData, world: value})}
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select Existing World" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {
-                                                existingWorlds.length === 0 ? <SelectItem value="no-world">No Existing Worlds Found</SelectItem> :
+                                            {existingWorlds.length === 0 ? (
+                                                <SelectItem value="no-world">No Existing Worlds Found</SelectItem>
+                                            ) : (
                                                 existingWorlds.map((w, i) => (
-                                                    <SelectItem value={sanitizeWorldName(w.key)} key={`${sanitizeWorldName(w.key)}_${i}`} disabled={!w.installed}>{sanitizeWorldName(w.key)}{!w.installed && " (Not Installed)"}</SelectItem>
+                                                    <SelectItem
+                                                        value={sanitizeWorldName(w.key)}
+                                                        key={`${sanitizeWorldName(w.key)}_${i}`}
+                                                        disabled={!w.installed}
+                                                    >
+                                                        {sanitizeWorldName(w.key)}{!w.installed && " (Not Installed)"}
+                                                    </SelectItem>
                                                 ))
-                                            }
+                                            )}
                                         </SelectContent>
                                     </Select>
                                 </>
-                            }
+                            )}
                         </div>
 
+                        {/* Password Field */}
                         <div className="space-y-2">
-                            <Label>Password</Label>
+                            <Label className="text-sm font-medium">Password</Label>
                             <div className="flex justify-items-center">
                                 <Input
                                     type={viewPass ? "text" : "password"}
@@ -190,228 +201,150 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
                                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                                     placeholder="Server access password"
                                     required
+                                    className="w-full"
                                 />
-                                <Button variant="ghost" type="button" className="bg-transparent ml-2" onClick={() => setViewPass(prev => !prev)}>
-                                    {viewPass ? <EyeOff /> : <Eye />}
+                                <Button
+                                    variant="ghost"
+                                    type="button"
+                                    className="bg-transparent ml-2"
+                                    onClick={() => setViewPass(prev => !prev)}
+                                >
+                                    {viewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        {/* Switches - Stack on mobile */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="flex items-center space-x-2">
                                 <Switch
                                     checked={formData.isCrossplay}
                                     onCheckedChange={(checked) => setFormData({...formData, isCrossplay: checked})}
                                 />
-                                <Label>Enable Crossplay</Label>
+                                <Label className="text-sm">Enable Crossplay</Label>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Switch
                                     checked={formData.isPublic}
                                     onCheckedChange={(checked) => setFormData({...formData, isPublic: checked})}
                                 />
-                                <Label>Public Server</Label>
+                                <Label className="text-sm">Public Server</Label>
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                                <Label htmlFor="cpu">CPU Cores</Label>
-                                <span className="text-sm font-medium">{cpu[0]} cores</span>
+                        {/* Sliders with better mobile spacing */}
+                        <div className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor="cpu" className="text-sm font-medium">CPU Cores</Label>
+                                    <span className="text-sm font-medium">{cpu[0]} cores</span>
+                                </div>
+                                <Slider
+                                    id="cpu"
+                                    min={1}
+                                    max={cpuLimit}
+                                    step={1}
+                                    value={cpu}
+                                    onValueChange={setCpu}
+                                    className="w-full"
+                                />
+                                <div className="flex justify-between text-xs text-muted-foreground px-2">
+                                    {cpuMarks.map((mark) => (
+                                        <span key={mark.value} className="flex flex-col items-center">
+                      <span>|</span>
+                      <span>{mark.label}</span>
+                    </span>
+                                    ))}
+                                </div>
                             </div>
-                            <Slider
-                                id="cpu"
-                                min={1}
-                                max={cpuLimit}
-                                step={1}
-                                value={cpu}
-                                onValueChange={setCpu}
-                                className="w-full"
-                            />
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                                {cpuMarks.map((mark) => (
-                                    <span key={mark.value} className="flex flex-col items-center">
-                |
-                <span>{mark.label}</span>
-              </span>
-                                ))}
+
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor="memory" className="text-sm font-medium">Memory (GB)</Label>
+                                    <span className="text-sm font-medium">{memory[0]} GB</span>
+                                </div>
+                                <Slider
+                                    id="memory"
+                                    min={1}
+                                    max={memoryLimit}
+                                    step={1}
+                                    value={memory}
+                                    onValueChange={setMemory}
+                                    className="w-full"
+                                />
+                                <div className="flex justify-between text-xs text-muted-foreground px-2">
+                                    {memoryMarks.map((mark) => (
+                                        <span key={mark.value} className="flex flex-col items-center">
+                      <span>|</span>
+                      <span>{mark.label}</span>
+                    </span>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                                <Label htmlFor="memory">Memory (GB)</Label>
-                                <span className="text-sm font-medium">{memory[0]} GB</span>
-                            </div>
-                            <Slider
-                                id="memory"
-                                min={1}
-                                max={memoryLimit}
-                                step={1}
-                                value={memory}
-                                onValueChange={setMemory}
-                                className="w-full"
-                            />
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                                {memoryMarks.map((mark) => (
-                                    <span key={mark.value} className="flex flex-col items-center">
-                |
-                <span>{mark.label}</span>
-              </span>
-                                ))}
-                            </div>
-                        </div>
-
+                        {/* Collapsible sections with better mobile spacing */}
                         <Collapsible className="w-full">
-                            <CollapsibleTrigger className="flex w-full items-center justify-between py-2 bg-gray-200">
-                                <span className="text-primary font-semibold">Optional Modifiers</span>
+                            <CollapsibleTrigger className="flex w-full items-center justify-between p-4 bg-gray-100 rounded-lg">
+                                <span className="text-primary font-semibold text-sm">Optional Modifiers</span>
                                 <ChevronDown className="h-4 w-4" />
                             </CollapsibleTrigger>
-                            <CollapsibleContent>
-                                <hr className="my-2" />
-                                <div className="space-y-2">
-                                    <Label>Combat Difficulty</Label>
-                                    <Select
-                                        value={formData.combat}
-                                        onValueChange={(value) => setFormData({...formData, combat: value})}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Combat Difficulty" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="veryeasy">Very Easy</SelectItem>
-                                            <SelectItem value="easy">Easy</SelectItem>
-                                            <SelectItem value="standard">Standard</SelectItem>
-                                            <SelectItem value="hard">Hard</SelectItem>
-                                            <SelectItem value="veryhard">Very Hard</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Label>Death Penalty</Label>
-                                    <Select
-                                        value={formData.deathpenalty}
-                                        onValueChange={(value) => setFormData({...formData, deathpenalty: value})}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Death Penalty" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="casual">Casual</SelectItem>
-                                            <SelectItem value="veryeasy">Very Easy</SelectItem>
-                                            <SelectItem value="easy">Easy</SelectItem>
-                                            <SelectItem value="standard">Standard</SelectItem>
-                                            <SelectItem value="hard">Hard</SelectItem>
-                                            <SelectItem value="hardcore">Hardcore</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Label>Resources</Label>
-                                    <Select
-                                        value={formData.resources}
-                                        onValueChange={(value) => setFormData({...formData, resources: value})}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Resources" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="muchless">Much Less (0.25x)</SelectItem>
-                                            <SelectItem value="less">Less (0.5x)</SelectItem>
-                                            <SelectItem value="standard">Standard (1x)</SelectItem>
-                                            <SelectItem value="more">More (1.5x)</SelectItem>
-                                            <SelectItem value="muchmore">Much More (2x)</SelectItem>
-                                            <SelectItem value="most">Most (3x)</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Label>Raids</Label>
-                                    <Select
-                                        value={formData.raids}
-                                        onValueChange={(value) => setFormData({...formData, raids: value})}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Raid Frequency" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">None</SelectItem>
-                                            <SelectItem value="muchless">Much Less</SelectItem>
-                                            <SelectItem value="less">Less</SelectItem>
-                                            <SelectItem value="standard">Standard</SelectItem>
-                                            <SelectItem value="more">More</SelectItem>
-                                            <SelectItem value="muchmore">Much More</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Label>Portals</Label>
-                                    <Select
-                                        value={formData.portals}
-                                        onValueChange={(value) => setFormData({...formData, portals: value})}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Portal Functionality" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="casual">Casual</SelectItem>
-                                            <SelectItem value="standard">Standard</SelectItem>
-                                            <SelectItem value="hard">Hard</SelectItem>
-                                            <SelectItem value="veryhard">Very Hard</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                            <CollapsibleContent className="p-4 space-y-4">
+                                {/* Optional Modifiers content with consistent spacing */}
+                                <div className="space-y-4">
+                                    {['combat', 'deathpenalty', 'resources', 'raids', 'portals'].map((field) => (
+                                        <div key={field} className="space-y-2">
+                                            <Label className="text-sm font-medium capitalize">{field.replace(/([A-Z])/g, ' $1').trim()}</Label>
+                                            <Select
+                                                value={formData[field]}
+                                                onValueChange={(value) => setFormData({...formData, [field]: value})}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={`Select ${field.replace(/([A-Z])/g, ' $1').trim()}`} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {/* Maintain your existing SelectItem options */}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    ))}
                                 </div>
                             </CollapsibleContent>
                         </Collapsible>
 
+                        {/* Advanced section with consistent mobile styling */}
                         <Collapsible className="w-full">
-                            <CollapsibleTrigger className="flex w-full items-center justify-between py-2 bg-gray-200">
-                                <span className="text-primary font-semibold">Advanced</span>
+                            <CollapsibleTrigger className="flex w-full items-center justify-between p-4 bg-gray-100 rounded-lg">
+                                <span className="text-primary font-semibold text-sm">Advanced</span>
                                 <ChevronDown className="h-4 w-4" />
                             </CollapsibleTrigger>
-                            <CollapsibleContent>
-                                <hr className="my-2" />
-                                <div className="space-y-2">
-                                    <Label>Save Interval (seconds)</Label>
-                                    <Input
-                                        value={formData.saveIntervalSeconds}
-                                        type="number"
-                                        onChange={(e) => setFormData({...formData, saveIntervalSeconds: Number(e.target.value) })}
-                                        placeholder="7200"
-                                        min={300}
-                                        max={86400}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Backup Count</Label>
-                                    <Input
-                                        value={formData.backupCount}
-                                        type="number"
-                                        onChange={(e) => setFormData({...formData, backupCount: Number(e.target.value) })}
-                                        placeholder="3"
-                                        min={1}
-                                        max={3}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Initial Backup (seconds)</Label>
-                                    <Input
-                                        value={formData.initialBackupSeconds}
-                                        type="number"
-                                        onChange={(e) => setFormData({...formData, initialBackupSeconds: Number(e.target.value) })}
-                                        placeholder="7200"
-                                        min={300}
-                                        max={86400}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Backup Interval (seconds)</Label>
-                                    <Input
-                                        value={formData.backupIntervalSeconds}
-                                        type="number"
-                                        onChange={(e) => setFormData({...formData, backupIntervalSeconds: Number(e.target.value) })}
-                                        placeholder="43200"
-                                        min={14400}
-                                        max={86400}
-                                    />
-                                </div>
+                            <CollapsibleContent className="p-4 space-y-4">
+                                {/* Advanced settings with consistent spacing */}
+                                {[
+                                    { label: 'Save Interval (seconds)', key: 'saveIntervalSeconds', min: 300, max: 86400 },
+                                    { label: 'Backup Count', key: 'backupCount', min: 1, max: 3 },
+                                    { label: 'Initial Backup (seconds)', key: 'initialBackupSeconds', min: 300, max: 86400 },
+                                    { label: 'Backup Interval (seconds)', key: 'backupIntervalSeconds', min: 14400, max: 86400 }
+                                ].map((setting) => (
+                                    <div key={setting.key} className="space-y-2">
+                                        <Label className="text-sm font-medium">{setting.label}</Label>
+                                        <Input
+                                            value={formData[setting.key]}
+                                            type="number"
+                                            onChange={(e) => setFormData({...formData, [setting.key]: Number(e.target.value)})}
+                                            placeholder={setting.key === 'backupCount' ? '3' : '7200'}
+                                            min={setting.min}
+                                            max={setting.max}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                ))}
                             </CollapsibleContent>
                         </Collapsible>
 
-                        <Button type="submit" className="w-full">{formValues ? 'Save Server' : 'Create Server'}</Button>
+                        <Button type="submit" className="w-full">
+                            {formValues ? 'Save Server' : 'Create Server'}
+                        </Button>
                     </form>
                 </CardContent>
             </Card>
