@@ -736,8 +736,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="relative min-h-screen">
-            {/* Mobile Menu Button - Only visible on small screens */}
+        <div className="relative min-h-screen flex">
             <div className="lg:hidden fixed top-0 left-0 z-30 m-4">
                 <Button
                     variant="outline"
@@ -748,17 +747,25 @@ const Dashboard = () => {
                 </Button>
             </div>
 
-            <div className={`fixed inset-y-0 left-0 z-20 transform lg:relative lg:translate-x-0 lg:flex transition-transform duration-200 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className={`
+                fixed lg:static 
+                inset-y-0 left-0 
+                z-20 
+                transform lg:transform-none
+                transition-transform duration-200 ease-in-out
+                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+                lg:translate-x-0
+            `}>
                 <Sidebar
                     activeView={activeView}
                     onViewChange={(v) => {
                         setActiveView(v);
-                        // setIsSidebarOpen(false);
+                        setIsSidebarOpen(false);
                     }}
                 />
             </div>
 
-            <div className="flex-1 min-w-0 lg:ml-0">
+            <main className="flex-1 w-full min-w-0 lg:ml-0">  {/* Added w-full */}
                 <div className="pl-16 lg:pl-0">
                     <Navbar
                         onLogout={logout}
@@ -767,7 +774,6 @@ const Dashboard = () => {
                     />
                 </div>
 
-                {/* Error Dialog */}
                 {errorDialogue.visible && (
                     <Alert variant="destructive" className="mx-4 mt-16 lg:m-6 max-w-3xl">
                         <AlertCircle className="h-4 w-4" />
@@ -781,9 +787,8 @@ const Dashboard = () => {
                 <div className="p-4 lg:p-6">
                     {renderViews()}
                 </div>
-            </div>
+            </main>
 
-            {/* Overlay for mobile sidebar */}
             {isSidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black/20 lg:hidden z-10"

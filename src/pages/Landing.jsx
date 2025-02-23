@@ -101,7 +101,7 @@ const Landing = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-300">
             {/* Hero Section */}
             <div className="container mx-auto px-4 py-16">
                 <div className="text-center mb-16 animate-fade-in">
@@ -130,7 +130,7 @@ const Landing = () => {
                                 <div className="flex items-center justify-center">
                                     {feature.icon}
                                 </div>
-                                <CardTitle className="text-center text-xl mt-2">
+                                <CardTitle className="text-center text-xl mt-2 text-gray-300">
                                     {feature.title}
                                 </CardTitle>
                             </CardHeader>
@@ -160,7 +160,7 @@ const Landing = () => {
                                     </div>
                                 )}
                                 <CardHeader>
-                                    <CardTitle className="text-center text-2xl text-white">{tier.name}</CardTitle>
+                                    <CardTitle className="text-center text-2xl text-gray-300">{tier.name}</CardTitle>
                                     <p className="text-center text-3xl font-bold text-orange-500 mt-4">{tier.price}</p>
                                     <p className="text-center text-gray-400">per month</p>
                                 </CardHeader>
