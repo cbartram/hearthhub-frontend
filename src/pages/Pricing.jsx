@@ -71,6 +71,15 @@ const Pricing = () => {
         }
     }
 
+    const createBillingSession = async () => {
+        try {
+            const res = await apiClient.createBillingSession(sessionId)
+            window.location.href = res.url
+        } catch (e) {
+            console.log('error creating stripe billing session: ', e)
+        }
+    }
+
     useEffect(() => {
         const query = new URLSearchParams(window.location.search);
         if (query.get('success')) {
@@ -97,8 +106,7 @@ const Pricing = () => {
                         <Check className="h-4 w-4" />
                         <AlertTitle>Purchase Successful</AlertTitle>
                         <AlertDescription>
-                            View the dashboard <a href="/dashboard">here</a> or
-                            manage your billing information <a href="#">here</a>.
+                            <Button className="mt-2" onClick={() => createBillingSession()}>Manage Subscription & Billing</Button>
                         </AlertDescription>
                     </Alert>
                 </div>
