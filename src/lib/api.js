@@ -78,7 +78,7 @@ class KubeApiClient extends ApiClient {
     }
 
     async createCheckoutSession(item) {
-        return this.request(`/api/v1/stripe/create-checkout-session?priceId=${item.id}`, {
+        return this.request(`/api/v1/stripe/create-checkout-session?key=${item.name}`, {
             method: 'GET'
         })
     }

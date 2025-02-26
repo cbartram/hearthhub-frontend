@@ -1,15 +1,24 @@
-import React from 'react';
-import { Check } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import {Check, TriangleAlert } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {KubeApiClient} from "@/lib/api.js";
 import {useAuth} from "@/context/AuthContext.jsx";
 import Navbar from "@/components/Navbar.jsx";
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert"
 
 const Pricing = () => {
     const {user, logout} = useAuth()
     const apiClient = new KubeApiClient(user)
+    let [canceled, setCanceled] = useState(false);
+    let [success, setSuccess] = useState(false);
+    let [sessionId, setSessionId] = useState(null);
+
     const pricingTiers = [
         {
             name: "Starter",
@@ -22,7 +31,6 @@ const Pricing = () => {
                 "24/7 Uptime",
                 "Basic Support"
             ],
-            id: 'price_1Qwlx4BfQ0pxgTaIs3imFiHW',
             recommended: false
         },
         {
@@ -36,7 +44,6 @@ const Pricing = () => {
                 "24/7 Uptime",
                 "Basic Support",
             ],
-            id: 'price_1QwlxiBfQ0pxgTaIaReEiXSs',
             recommended: true
         },
         {
@@ -51,7 +58,6 @@ const Pricing = () => {
                 "Basic Support",
                 "Existing World Upload"
             ],
-            id: 'price_1QwlyFBfQ0pxgTaIGhaf0j8q',
             recommended: false
         }
     ];
@@ -65,6 +71,18 @@ const Pricing = () => {
         }
     }
 
+    useEffect(() => {
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('success')) {
+            setSuccess(true);
+            setSessionId(query.get('session_id'));
+        }
+
+        if(query.get("canceled")) {
+            setCanceled(true)
+        }
+    }, [])
+
     return (
         <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
             <Navbar
@@ -72,6 +90,31 @@ const Pricing = () => {
                 userId={user.discordId}
                 avatarId={user.avatarId}
             />
+            {
+                success && sessionId &&
+                <div className="flex align-center justify-center">
+                    <Alert className="border-2 border-green-300 mt-12 max-w-3xl">
+                        <Check className="h-4 w-4" />
+                        <AlertTitle>Purchase Successful</AlertTitle>
+                        <AlertDescription>
+                            View the dashboard <a href="/dashboard">here</a> or
+                            manage your billing information <a href="#">here</a>.
+                        </AlertDescription>
+                    </Alert>
+                </div>
+            }
+            {
+                canceled &&
+                <div className="flex align-center justify-center">
+                    <Alert className="border-2 border-orange-300  mt-12 max-w-3xl">
+                        <TriangleAlert className="h-4 w-4" />
+                        <AlertTitle>Order Canceled</AlertTitle>
+                        <AlertDescription>
+                            Your order has been cancelled you have not been charged.
+                        </AlertDescription>
+                    </Alert>
+                </div>
+            }
             <div className="mx-auto max-w-6xl px-4 py-16">
                 <div className="text-center mb-16">
                     <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4">
@@ -82,7 +125,6 @@ const Pricing = () => {
                     </p>
                 </div>
 
-                {/* Pricing Cards */}
                 <div className="grid md:grid-cols-3 gap-8 mb-16">
                     {pricingTiers.map((tier) => (
                         <Card
