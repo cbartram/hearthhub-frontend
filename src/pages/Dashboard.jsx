@@ -13,6 +13,7 @@ import {Button} from "@/components/ui/button";
 import {AlertCircle, Menu} from "lucide-react";
 import {isProd, K8S_BASE_URL} from "@/lib/constants";
 import ConfigViewer from "@/components/ConfigViewer.jsx";
+import {Navigate} from "react-router-dom";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
@@ -657,6 +658,11 @@ const Dashboard = () => {
     }
 
     const renderViews = () => {
+        // Check payment info for the user
+        if(!user.subscribed) {
+            return <Navigate to="/pricing" replace />;
+        }
+
         const serverList = <ServersList
             logs={logs}
             metrics={resourceMetrics}

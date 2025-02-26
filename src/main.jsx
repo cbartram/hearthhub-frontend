@@ -6,6 +6,7 @@ import AuthCallback from "@/components/AuthCallback";
 import Login from '@/pages/Login'
 import Dashboard from '@/pages/Dashboard'
 import Landing from "@/pages/Landing";
+import Pricing from "@/pages/Pricing"
 
 import { RedirectIfAuthenticated } from '@/components/RedirectIfAuthenticated'
 import './index.css'
@@ -37,6 +38,14 @@ createRoot(document.getElementById('root')).render(
                         <ProtectedRoute>
                             <Dashboard />
                         </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/pricing"
+                    element={
+                    <ProtectedRoute>
+                        <Pricing />
+                    </ProtectedRoute>
                     }
                 />
             </Routes>

@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Logo from '@/assets/hearthhub_logo.png'
-import {AlertCircle} from "lucide-react";
+import {AlertCircle, Home} from "lucide-react";
 import {
     Alert,
     AlertDescription,
@@ -55,6 +55,11 @@ const Login = () => {
                     <Button className="w-full bg-[#5865f2] hover:bg-[#707cfa] active:bg-[#4c5bfc] focus:outline-none focus:bg-[#4c5bfc]" onClick={discordRedirect}>
                         <span className="discord-icon" />
                         Sign In with Discord
+                    </Button>
+
+                    <Button className="w-full bg-gray-400 mt-3" onClick={() => window.location.href = "/"}>
+                        <Home />
+                        Home
                     </Button>
                 </CardContent>
             </Card>

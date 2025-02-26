@@ -30,10 +30,15 @@ export const RedirectIfAuthenticated = ({ children }) => {
         );
     }
 
-    if (user) {
+    // TODO Check needs to occur here if the user is a subscriber. If so redirect to /dashboard else to /pricing
+    if (user && user.subscriber) {
         // Redirect to dashboard, preserving any intended destination from state
         const from = location.state?.from?.pathname || "/dashboard";
         return <Navigate to={from} replace />;
+    }
+
+    if (user && !user.subscriber) {
+        return <Navigate to="/pricing" replace />;
     }
 
     return children;

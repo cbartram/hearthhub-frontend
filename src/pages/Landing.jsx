@@ -153,11 +153,12 @@ const Landing = () => {
     const pricingTiers = [
         {
             name: "Starter",
-            price: "$3.99",
+            price: "$4.99",
             features: [
-                "2GB RAM",
+                "4GB RAM",
                 "2 CPU Cores",
-                "10 Player Slots",
+                "3 Backups",
+                "2 Worlds",
                 "24/7 Uptime",
                 "Basic Support"
             ],
@@ -165,13 +166,14 @@ const Landing = () => {
         },
         {
             name: "Warrior",
-            price: "$5.99",
+            price: "$7.99",
             features: [
-                "4GB RAM",
-                "4 CPU Cores",
+                "8GB RAM",
+                "3 CPU Cores",
+                "6 Backups per world",
+                "4 Worlds",
                 "24/7 Uptime",
-                "Priority Support",
-                "Unlimited Backups"
+                "Basic Support",
             ],
             recommended: true
         },
@@ -181,9 +183,11 @@ const Landing = () => {
             features: [
                 "16GB RAM",
                 "8 CPU Cores",
+                "8 Backups per world",
+                "6 Worlds",
                 "24/7 Uptime",
-                "Premium Support",
-                "Unlimited Backups",
+                "Basic Support",
+                "Existing World Upload"
             ],
             recommended: false
         }
@@ -518,7 +522,7 @@ const Landing = () => {
                 ))}
             </div>
 
-            <div className="container mx-auto px-4 pb-24">
+            <div className="container mx-auto px-4 pb-24" id="features">
                 <div className="mb-32" ref={featuresRef}>
                     <motion.div
                         className="text-center mb-16"
@@ -590,7 +594,7 @@ const Landing = () => {
                     </div>
                 </div>
 
-                <div className="mb-12" ref={pricingRef}>
+                <div className="mb-12" ref={pricingRef} id="pricing">
                     <motion.div
                         className="text-center mb-16"
                         style={{
@@ -722,6 +726,7 @@ const Landing = () => {
                                                 : `0 0 20px rgba(255, 255, 255, 0.2)`
                                         }}
                                         whileTap={{ scale: 0.98 }}
+                                        onClick={() => discordRedirect()}
                                     >
                                         Select plan
                                     </motion.button>
