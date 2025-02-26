@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { motion, useAnimationControls } from 'framer-motion';
-import { Shield, Server, Cpu, Cog, Upload, Clock, BarChart, Terminal, Database } from "lucide-react";
+import { motion, useAnimationControls, useTransform } from 'framer-motion';
+import { Server, Cpu, Cog, Upload, Clock, BarChart, Terminal } from "lucide-react";
 import {discordRedirect} from "@/lib/utils";
 
 const Landing = () => {
@@ -25,6 +25,26 @@ const Landing = () => {
 
     const memoryTotalGB = 8;
     const memoryUsedGB = (memoryPercentage * memoryTotalGB / 100).toFixed(1);
+
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Close mobile menu when resizing to desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                setIsOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const fadeInUp = {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5 }
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -99,20 +119,35 @@ const Landing = () => {
 
     const features = [
         {
-            icon: <Terminal size={24} />,
-            title: "One-Click Installation",
-            description: "Get your server running in seconds with our streamlined setup process"
+            icon: <Server className="w-6 h-6 mb-2" />,
+            title: "Dedicated Server Management",
+            description: "Professional management of your Valheim servers with 24/7 uptime and support."
         },
         {
-            icon: <Shield size={24} />,
-            title: "Automatic Backups",
-            description: "Your world is always safe with scheduled backups and easy restoration"
+            icon: <Cpu className="w-6 h-6 mb-2" />,
+            title: "Custom Resources",
+            description: "Choose your server's CPU and memory specifications to match your needs."
         },
         {
-            icon: <Database size={24} />,
-            title: "Mod Support",
-            description: "Install and manage your favorite mods with our intuitive control panel"
+            icon: <Cog className="w-6 h-6 mb-2" />,
+            title: "One-Click Mod Support",
+            description: "Upload and enable custom mods with a single click, including Valheim Plus configuration."
         },
+        {
+            icon: <Upload className="w-6 h-6 mb-2" />,
+            title: "World Upload",
+            description: "Continue your adventures by uploading and playing on your existing worlds."
+        },
+        {
+            icon: <Clock className="w-6 h-6 mb-2" />,
+            title: "Automated Backups",
+            description: "Configurable automated backups to S3 with one-click restore functionality."
+        },
+        {
+            icon: <BarChart className="w-6 h-6 mb-2" />,
+            title: "Real-Time Metrics",
+            description: "Monitor server CPU and memory usage in real-time."
+        }
     ];
 
     const pricingTiers = [
@@ -121,6 +156,7 @@ const Landing = () => {
             price: "$3.99",
             features: [
                 "2GB RAM",
+                "2 CPU Cores",
                 "10 Player Slots",
                 "24/7 Uptime",
                 "Basic Support"
@@ -132,7 +168,7 @@ const Landing = () => {
             price: "$5.99",
             features: [
                 "4GB RAM",
-                "20 Player Slots",
+                "4 CPU Cores",
                 "24/7 Uptime",
                 "Priority Support",
                 "Unlimited Backups"
@@ -143,36 +179,34 @@ const Landing = () => {
             name: "Legend",
             price: "$9.99",
             features: [
-                "8GB RAM",
-                "40 Player Slots",
+                "16GB RAM",
+                "8 CPU Cores",
                 "24/7 Uptime",
                 "Premium Support",
                 "Unlimited Backups",
-                "Custom Domain"
             ],
             recommended: false
         }
     ];
 
-    // Example testimonials
     const testimonials = [
         {
-            avatar: "/api/placeholder/40/40",
             name: "Erik Thorvaldson",
             role: "Guild Leader",
-            content: "Our clan has been using this service for months. The performance is incredible and support is always responsive."
+            content: "Running our 20-player server has never been easier. The mod support is incredible!",
+            avatar: "https://images.unsplash.com/photo-1624298357597-fd92dfbec01d?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         },
         {
-            avatar: "/api/placeholder/40/40",
-            name: "Freya Jorgensen",
-            role: "Experienced Player",
-            content: "I was tired of lag on my self-hosted server. Switching to this service solved all my problems instantly."
+            name: "Freya Bjornsdottir",
+            role: "Community Manager",
+            content: "The backup system saved our 60+ hour world when we had issues. Worth every penny!",
+            avatar: "https://plus.unsplash.com/premium_photo-1690407617686-d449aa2aad3c?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         },
         {
-            avatar: "/api/placeholder/40/40",
-            name: "Bjorn Ironside",
-            role: "Streamer",
-            content: "As a content creator, server reliability is crucial. This service has never let me or my viewers down."
+            name: "Thor Ironside",
+            role: "Mod Developer",
+            content: "As a mod creator, I love how easy it is to test and deploy new mods on these servers.",
+            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         }
     ];
 
@@ -203,9 +237,136 @@ const Landing = () => {
 
     return (
         <div className="bg-black text-white overflow-hidden">
-            {/* Interactive Hero Section */}
+            <motion.nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-800" style={{
+                backgroundColor: "rgba(17, 24, 39, 0.7)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)"
+            }}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-16">
+                        <div className="flex items-center">
+                            <motion.div
+                                className="flex-shrink-0 flex items-center"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <a href="#" className="flex items-center">
+                                    {/* Viking axe icon */}
+                                    <svg className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M14 15L20 9L22 11L16 17L14 15Z" />
+                                        <path d="M8.5 9L10.5 7L18 14.5L16 16.5L8.5 9Z" />
+                                        <path d="M8.5 9L7 10.5L3 6.5L4.5 5L8.5 9Z" />
+                                        <path d="M7 10.5L2 15.5L3.5 17L8.5 12L7 10.5Z" />
+                                        <path d="M14 15L12 17L4.5 9.5L6.5 7.5L14 15Z" />
+                                    </svg>
+                                    <span className="ml-2 text-xl font-bold text-white">Valheim Server</span>
+                                </a>
+                            </motion.div>
+
+                            {/* Desktop navigation links */}
+                            <div className="hidden md:ml-8 md:flex md:space-x-6">
+                                <motion.a
+                                    href="#features"
+                                    className="text-gray-300 hover:text-white py-2 text-sm font-medium"
+                                    whileHover={{ y: -2 }}
+                                    whileTap={{ y: 0 }}
+                                >
+                                    Features
+                                </motion.a>
+                                <motion.a
+                                    href="#pricing"
+                                    className="text-gray-300 hover:text-white py-2 text-sm font-medium"
+                                    whileHover={{ y: -2 }}
+                                    whileTap={{ y: 0 }}
+                                >
+                                    Pricing
+                                </motion.a>
+                                <motion.a
+                                    href="#mods"
+                                    className="text-gray-300 hover:text-white py-2 text-sm font-medium"
+                                    whileHover={{ y: -2 }}
+                                    whileTap={{ y: 0 }}
+                                >
+                                    Mods
+                                </motion.a>
+                                <motion.a
+                                    href="#community"
+                                    className="text-gray-300 hover:text-white py-2 text-sm font-medium"
+                                    whileHover={{ y: -2 }}
+                                    whileTap={{ y: 0 }}
+                                >
+                                    Community
+                                </motion.a>
+                            </div>
+                        </div>
+
+                        {/* Right side with CTA and mobile menu button */}
+                        <div className="flex items-center">
+                            <motion.div className="hidden md:flex">
+                                <motion.button
+                                    href="#join"
+                                    className="ml-4 px-4 py-2 rounded-md bg-[#5865f2] hover:bg-[#707cfa] active:bg-[#4c5bfc] focus:outline-none focus:bg-[#4c5bfc] text-white text-sm font-medium"
+                                    whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
+                                    whileTap={{ scale: 0.95 }}
+                                    transition={{ type: 'spring', stiffness: 500 }}
+                                    onClick={() => discordRedirect()}
+                                >
+                                    <span className="discord-icon mr-2" />
+                                    Sign in with Discord
+                                </motion.button>
+                            </motion.div>
+
+                            {/* Mobile menu button */}
+                            <motion.button
+                                onClick={() => setIsOpen(!isOpen)}
+                                className="md:hidden ml-4 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <span className="sr-only">Open main menu</span>
+                                {isOpen ? (
+                                    <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                ) : (
+                                    <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                )}
+                            </motion.button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile menu, show/hide based on menu state. */}
+                <motion.div
+                    className={`md:hidden ${isOpen ? 'block' : 'hidden'}`}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                        <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Features</a>
+                        <a href="#pricing" className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Pricing</a>
+                        <a href="#mods" className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Mods</a>
+                        <a href="#community" className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Community</a>
+                        <a href="#status" className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Server Status</a>
+                        <motion.button
+                            href="#join"
+                            className="ml-4 px-4 py-2 rounded-md bg-[#5865f2] hover:bg-[#707cfa] active:bg-[#4c5bfc] focus:outline-none focus:bg-[#4c5bfc] text-white text-sm font-medium"
+                            whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: 'spring', stiffness: 500 }}
+                            onClick={() => discordRedirect()}
+                        >
+                            <span className="discord-icon mr-2" />
+                            Sign in with Discord
+                        </motion.button>
+                    </div>
+                </motion.div>
+            </motion.nav>
+
             <div className="relative overflow-hidden bg-black min-h-screen flex items-center" ref={heroRef}>
-                {/* Animated background gradient */}
                 <motion.div
                     className="absolute inset-0"
                     style={{
@@ -214,7 +375,6 @@ const Landing = () => {
                     }}
                 />
 
-                {/* Animated background glowing spheres */}
                 <motion.div
                     className="absolute top-0 left-10 w-64 h-64 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 blur-3xl"
                     animate={sphere1Controls}
@@ -235,7 +395,6 @@ const Landing = () => {
 
                 <div className="container relative mx-auto px-4 pt-24 pb-20">
                     <div className="max-w-3xl mx-auto">
-                        {/* Main content with parallax effect */}
                         <motion.div
                             className="text-center mb-16"
                             style={{ y: scrollY * -0.2 }}
@@ -263,14 +422,6 @@ const Landing = () => {
                                 style={{ y: scrollY * 0.1 }}
                             >
                                 <motion.button
-                                    className="bg-white text-black hover:bg-gray-100 font-medium px-8 py-6 rounded-full"
-                                    whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(255, 255, 255, 0.3)" }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    Get started
-                                </motion.button>
-
-                                <motion.button
                                     onClick={() => discordRedirect()}
                                     className="bg-[#5865f2] hover:bg-[#707cfa] active:bg-[#4c5bfc] text-white focus:outline-none focus:bg-[#4c5bfc] font-medium px-8 py-6 h-auto rounded-full"
                                     whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(124, 58, 237, 0.3)" }}
@@ -282,7 +433,6 @@ const Landing = () => {
                             </motion.div>
                         </motion.div>
 
-                        {/* Interactive Stats section */}
                         <motion.div
                             className="grid grid-cols-3 gap-8 pt-12 border-t border-gray-800"
                             style={{
@@ -338,7 +488,6 @@ const Landing = () => {
                     </div>
                 </div>
 
-                {/* Floating particles */}
                 {[...Array(20)].map((_, i) => (
                     <motion.div
                         key={i}
@@ -370,7 +519,6 @@ const Landing = () => {
             </div>
 
             <div className="container mx-auto px-4 pb-24">
-                {/* Features Section with scroll interactions */}
                 <div className="mb-32" ref={featuresRef}>
                     <motion.div
                         className="text-center mb-16"
@@ -442,7 +590,6 @@ const Landing = () => {
                     </div>
                 </div>
 
-                {/* Pricing Section with interactive elements */}
                 <div className="mb-12" ref={pricingRef}>
                     <motion.div
                         className="text-center mb-16"
@@ -486,7 +633,6 @@ const Landing = () => {
                                         : `0 0 20px rgba(255, 255, 255, 0.1)`
                                 }}
                             >
-                                {/* Animated gradient background */}
                                 <motion.div
                                     className="absolute inset-0 opacity-10"
                                     style={{
@@ -585,7 +731,6 @@ const Landing = () => {
                     </div>
                 </div>
 
-                {/* Testimonials with scroll effects */}
                 <div className="mb-12" ref={testimonialsRef}>
                     <motion.div
                         className="text-center mb-16"
@@ -669,7 +814,6 @@ const Landing = () => {
                     </div>
                 </div>
 
-                {/* Monitoring Section with interactive elements */}
                 <div className="mb-32" ref={monitoringRef}>
                     <motion.div
                         className="text-center mb-16"
@@ -694,7 +838,6 @@ const Landing = () => {
                     </motion.div>
 
                     <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mt-48 relative">
-                        {/* Animated background glowing spheres */}
                         <motion.div
                             className="absolute top-0 left-0 w-64 h-64 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 blur-3xl"
                             animate={sphere1Controls}
@@ -725,7 +868,6 @@ const Landing = () => {
                                 boxShadow: `0 0 20px rgba(59, 130, 246, 0.2)`
                             }}
                         >
-                            {/* Animated background effect */}
                             <motion.div
                                 className="absolute inset-0 opacity-5"
                                 style={{
@@ -929,6 +1071,142 @@ const Landing = () => {
                     </motion.div>
                 </div>
         </div>
+            <footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
+                <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+                    <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
+                        <motion.div
+                            className="col-span-2 md:col-span-1"
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            variants={fadeInUp}
+                        >
+                            <h3 className="text-xl font-semibold text-white mb-4">Valheim Server</h3>
+                            <p className="text-sm mb-4">Join the battle in Valheim with our dedicated server hosting. Experience lag-free gameplay and conquer the Norse wilderness.</p>
+                            <div className="flex space-x-4">
+                                <a href="#" className="text-gray-400 hover:text-white">
+                                    <span className="sr-only">Discord</span>
+                                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.995a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
+                                    </svg>
+                                </a>
+                                <a href="#" className="text-gray-400 hover:text-white">
+                                    <span className="sr-only">Twitter</span>
+                                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0 0 22 5.92a8.19 8.19 0 0 1-2.357.646 4.118 4.118 0 0 0 1.804-2.27 8.224 8.224 0 0 1-2.605.996 4.107 4.107 0 0 0-6.993 3.743 11.65 11.65 0 0 1-8.457-4.287 4.106 4.106 0 0 0 1.27 5.477A4.073 4.073 0 0 1 2.8 9.713v.052a4.105 4.105 0 0 0 3.292 4.022 4.093 4.093 0 0 1-1.853.07 4.108 4.108 0 0 0 3.834 2.85A8.233 8.233 0 0 1 2 18.407a11.615 11.615 0 0 0 6.29 1.84" />
+                                    </svg>
+                                </a>
+                                <a href="#" className="text-gray-400 hover:text-white">
+                                    <span className="sr-only">GitHub</span>
+                                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            variants={fadeInUp}
+                            transition={{ delay: 0.1 }}
+                        >
+                            <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Server</h3>
+                            <ul className="space-y-2">
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Features</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Mods</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Server Status</a></li>
+                            </ul>
+                        </motion.div>
+
+                        <motion.div
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            variants={fadeInUp}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Community</h3>
+                            <ul className="space-y-2">
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Discord</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Events</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Rules</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Showcase</a></li>
+                            </ul>
+                        </motion.div>
+
+                        <motion.div
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            variants={fadeInUp}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Support</h3>
+                            <ul className="space-y-2">
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                                <li><a href="#" className="text-base text-gray-400 hover:text-white transition-colors">Tutorials</a></li>
+                            </ul>
+                        </motion.div>
+
+                        <motion.div
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            variants={fadeInUp}
+                            transition={{ delay: 0.4 }}
+                        >
+                            <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Join Our Server</h3>
+                            <p className="text-base text-gray-400 mb-4">Get updates on server events and maintenance.</p>
+                            <form className="mt-4 sm:flex sm:max-w-md">
+                                <label htmlFor="email-address" className="sr-only">Email address</label>
+                                <input
+                                    type="email"
+                                    name="email-address"
+                                    id="email-address"
+                                    autoComplete="email"
+                                    required
+                                    className="appearance-none min-w-0 w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-4 text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400"
+                                    placeholder="Enter your email"
+                                />
+                                <div className="mt-3 rounded-md sm:mt-0 sm:ml-3 sm:flex-shrink-0">
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        type="submit"
+                                        className="w-full bg-blue-600 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500"
+                                    >
+                                        Subscribe
+                                    </motion.button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+
+                    <motion.div
+                        initial="initial"
+                        whileInView="animate"
+                        viewport={{ once: true }}
+                        variants={fadeInUp}
+                        transition={{ delay: 0.5 }}
+                        className="mt-12 pt-8 border-t border-gray-800"
+                    >
+                        <p className="text-base text-gray-400 text-center">
+                            &copy; {new Date().getFullYear()} Valheim Dedicated Server. All rights reserved.
+                        </p>
+                        <div className="mt-4 flex justify-center space-x-6">
+                            <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a>
+                            <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms</a>
+                            <a href="#" className="text-gray-400 hover:text-white transition-colors">Cookies</a>
+                            <a href="#" className="text-gray-400 hover:text-white transition-colors">Sitemap</a>
+                        </div>
+                    </motion.div>
+                </div>
+            </footer>
     </div>
     );
 };
