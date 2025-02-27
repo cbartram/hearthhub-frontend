@@ -29,7 +29,7 @@ export const ProtectedRoute = ({ children, resource, requireSubscription = false
         };
 
         checkAuth();
-    }, []);
+    }, [processingComplete]);
 
     useEffect(() => {
         const query = new URLSearchParams(window.location.search);
