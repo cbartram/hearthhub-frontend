@@ -53,8 +53,8 @@ const Dashboard = () => {
     const [resourceMetrics, setResourceMetrics] = useState([])
     // TODO Set cpu and mem limit on the user's account rather than from the server
     // this will let us add plans which increase cpu/mem limit for servers
-    const [cpuLimit, setCpuLimit] = useState(2)
-    const [memLimit, setMemLimit] = useState(6)
+    const [cpuLimit, setCpuLimit] = useState(user.subscriptionLimits.cpuLimit)
+    const [memLimit, setMemLimit] = useState(user.subscriptionLimits.memoryLimit)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeView, setActiveView] = useState('servers');
     const [serversLoading, setServersLoading] = useState(true)
@@ -93,8 +93,6 @@ const Dashboard = () => {
                                     joinCode: ""
                                 }))
                             ])
-                            setCpuLimit(s.cpu_limit)
-                            setMemLimit(s.memory_limit)
                         })
                         .catch(err => {
                             console.error('failed to load servers: ', err);
