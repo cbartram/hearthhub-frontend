@@ -41,12 +41,14 @@ const Sidebar = ({ activeView, onViewChange, skeleton }) => {
     if(skeleton) {
         return <div className="w-80 bg-gray-300 text-secondary-foreground border-r p-4 h-screen flex flex-col drop-shadow-md border-0">
             <div className="flex items-center mb-8">
-        <span className="w-24 h-24 rounded-full">
-            <img src={HearthHubLogo} alt="hearthub-logo" width={100} height={100} />
-        </span>
-                <h1 className="font-bold text-2xl align-middle">HearthHub</h1>
             </div>
             <nav className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+            </nav>
+            <nav className="space-y-2 mt-4">
                 <Skeleton className="h-4 w-[250px]" />
                 <Skeleton className="h-4 w-[200px]" />
                 <Skeleton className="h-4 w-[250px]" />

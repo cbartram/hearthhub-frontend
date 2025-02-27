@@ -83,7 +83,13 @@ class KubeApiClient extends ApiClient {
         })
     }
 
-    async createBillingSession(sessionId) {
+    async createBillingSession(sessionId, customerId) {
+        if(sessionId == null) {
+            return this.request(`/api/v1/stripe/create-billing-session?customerId=${customerId}`, {
+                method: 'GET'
+            })
+        }
+
         return this.request(`/api/v1/stripe/create-billing-session?sessionId=${sessionId}`, {
             method: 'GET'
         })

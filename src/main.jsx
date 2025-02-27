@@ -18,7 +18,7 @@ createRoot(document.getElementById('root')).render(
                 <Route
                     path="/"
                     element={
-                        <RedirectIfAuthenticated>
+                        <RedirectIfAuthenticated resource="landing">
                             <Landing />
                         </RedirectIfAuthenticated>
                     }
@@ -26,7 +26,7 @@ createRoot(document.getElementById('root')).render(
                 <Route
                     path="/login"
                     element={
-                        <RedirectIfAuthenticated>
+                        <RedirectIfAuthenticated resource="login">
                             <Login />
                         </RedirectIfAuthenticated>
                     }
@@ -35,7 +35,7 @@ createRoot(document.getElementById('root')).render(
                 <Route
                     path="/dashboard"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute resource="dashboard" requireSubscription>
                             <Dashboard />
                         </ProtectedRoute>
                     }
@@ -43,7 +43,7 @@ createRoot(document.getElementById('root')).render(
                 <Route
                     path="/pricing"
                     element={
-                    <ProtectedRoute>
+                    <ProtectedRoute resource="pricing">
                         <Pricing />
                     </ProtectedRoute>
                     }

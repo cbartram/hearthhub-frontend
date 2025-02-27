@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import {createCognitoUser} from '@/lib/utils.ts'
-import {K8S_BASE_URL} from "@/lib/constants.ts";
+import {K8S_BASE_URL, isProd} from "@/lib/constants.ts";
 const AuthContext = createContext(null);
 
 // AuthProvider is used in main.jsx and provides the login, logout, and user props to any component
@@ -15,20 +15,21 @@ export const AuthProvider = ({ children }) => {
      * stored tokens in local storage to see if it can use them to authenticate the user without going through discord
      * OAuth again.
      *
+     * @param resource The resource to be authorized for i.e. pricing or dashboard
+     *
      * If tokens are present and good the authenticated cognito user will be returned else null.
      * @returns {Promise<CognitoUser>}
      */
-    const getUser = async () => {
+    const getUser = async (resource) => {
         const refreshToken = localStorage.getItem("refreshToken")
         const discordId = localStorage.getItem("discordId")
 
         if(refreshToken == null || discordId == null) {
-            console.error("cognito refresh token or discord id does not exist in local storage. Cannot auth")
             return Promise.reject("cognito refresh token or discord id does not exist in local storage.")
         }
 
         try {
-            const response = await fetch(`${K8S_BASE_URL}/api/v1/cognito/auth`, {
+            const response = await fetch(`${isProd() ? K8S_BASE_URL : 'http://localhost:8080'}/api/v1/cognito/auth?resource=${resource}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

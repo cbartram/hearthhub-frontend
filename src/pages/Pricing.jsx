@@ -16,8 +16,6 @@ const Pricing = () => {
     const {user, logout} = useAuth()
     const apiClient = new KubeApiClient(user)
     let [canceled, setCanceled] = useState(false);
-    let [success, setSuccess] = useState(false);
-    let [sessionId, setSessionId] = useState(null);
 
     const pricingTiers = [
         {
@@ -71,22 +69,8 @@ const Pricing = () => {
         }
     }
 
-    const createBillingSession = async () => {
-        try {
-            const res = await apiClient.createBillingSession(sessionId)
-            window.location.href = res.url
-        } catch (e) {
-            console.log('error creating stripe billing session: ', e)
-        }
-    }
-
     useEffect(() => {
         const query = new URLSearchParams(window.location.search);
-        if (query.get('success')) {
-            setSuccess(true);
-            setSessionId(query.get('session_id'));
-        }
-
         if(query.get("canceled")) {
             setCanceled(true)
         }
@@ -100,25 +84,13 @@ const Pricing = () => {
                 avatarId={user.avatarId}
             />
             {
-                success && sessionId &&
-                <div className="flex align-center justify-center">
-                    <Alert className="border-2 border-green-300 mt-12 max-w-3xl">
-                        <Check className="h-4 w-4" />
-                        <AlertTitle>Purchase Successful</AlertTitle>
-                        <AlertDescription>
-                            <Button className="mt-2" onClick={() => createBillingSession()}>Manage Subscription & Billing</Button>
-                        </AlertDescription>
-                    </Alert>
-                </div>
-            }
-            {
                 canceled &&
                 <div className="flex align-center justify-center">
                     <Alert className="border-2 border-orange-300  mt-12 max-w-3xl">
                         <TriangleAlert className="h-4 w-4" />
                         <AlertTitle>Order Canceled</AlertTitle>
                         <AlertDescription>
-                            Your order has been cancelled you have not been charged.
+                            Your order has been cancelled and you have <b>not</b> been charged.
                         </AlertDescription>
                     </Alert>
                 </div>

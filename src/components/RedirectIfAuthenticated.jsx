@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Loader2 } from "lucide-react";
+import Sidebar from "@/components/Sidebar.jsx";
+import Navbar from "@/components/Navbar.jsx";
+import {renderSkeleton} from "@/components/ServersList";
 
-export const RedirectIfAuthenticated = ({ children }) => {
+export const RedirectIfAuthenticated = ({ children, resource }) => {
     const { user, getUser } = useAuth();
-    const location = useLocation();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                await getUser();
+                await getUser(resource);
             } catch (error) {
                 console.error("Authentication check failed:", error);
             } finally {
@@ -24,20 +25,22 @@ export const RedirectIfAuthenticated = ({ children }) => {
 
     if (isLoading) {
         return (
-            <div className="h-screen w-full flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="flex h-screen">
+                <Sidebar skeleton />
+                <div className="flex-1 min-w-24">
+                    <Navbar skeleton />
+                    {renderSkeleton()}
+                </div>
             </div>
         );
     }
 
-    // TODO Check needs to occur here if the user is a subscriber. If so redirect to /dashboard else to /pricing
-    if (user && user.subscriber) {
-        // Redirect to dashboard, preserving any intended destination from state
-        const from = location.state?.from?.pathname || "/dashboard";
-        return <Navigate to={from} replace />;
+    if (user && user.subscriptionStatus === "active") {
+        return <Navigate to="/dashboard" replace />;
     }
 
-    if (user && !user.subscriber) {
+    if (user && user.subscriptionStatus !== "active") {
+        console.log(`user exists with sub status: ${user.subscriptionStatus} redirecting to /pricing`)
         return <Navigate to="/pricing" replace />;
     }
 

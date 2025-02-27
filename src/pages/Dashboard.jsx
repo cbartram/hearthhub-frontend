@@ -13,7 +13,6 @@ import {Button} from "@/components/ui/button";
 import {AlertCircle, Menu} from "lucide-react";
 import {isProd, K8S_BASE_URL} from "@/lib/constants";
 import ConfigViewer from "@/components/ConfigViewer.jsx";
-import {Navigate} from "react-router-dom";
 
 const DEFAULT_MODS = ["ValheimPlus", "ValheimPlus_Grant", "DisplayBepInExInfo", "BetterArchery", "BetterUI", "PlantEverything", "EquipmentAndQuickSlots"]
 
@@ -386,6 +385,19 @@ const Dashboard = () => {
         );
     }
 
+    /**
+     * Creates a new billing session to direct users towards using the customer id.
+     * @param customerId String stripe customer id
+     * @returns {Promise<void>}
+     */
+    const createBillingSession = async (customerId) => {
+        try {
+            const res = await kubeApi.createBillingSession(null, customerId)
+            window.location.href = res.url
+        } catch (e) {
+            console.log('error creating stripe billing session: ', e)
+        }
+    }
 
     /**
      * Converts a list of modifiers (needed to send a request to the server) into an object; required to prepopulate
@@ -658,11 +670,6 @@ const Dashboard = () => {
     }
 
     const renderViews = () => {
-        // Check payment info for the user
-        if(!user.subscribed) {
-            return <Navigate to="/pricing" replace />;
-        }
-
         const serverList = <ServersList
             logs={logs}
             metrics={resourceMetrics}
@@ -775,6 +782,7 @@ const Dashboard = () => {
                 <div className="pl-16 lg:pl-0">
                     <Navbar
                         onLogout={logout}
+                        onBillingSession={() => createBillingSession(user.customerId)}
                         userId={user.discordId}
                         avatarId={user.avatarId}
                     />
