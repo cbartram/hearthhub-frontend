@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import {Slider} from "@/components/ui/slider";
 
-const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit }) => {
+const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit, backupLimit }) => {
     const [cpu, setCpu] = React.useState([1]);
     const [memory, setMemory] = React.useState([1]);
 
@@ -322,7 +322,7 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
                                 {/* Advanced settings with consistent spacing */}
                                 {[
                                     { label: 'Save Interval (seconds)', key: 'saveIntervalSeconds', min: 300, max: 86400 },
-                                    { label: 'Backup Count', key: 'backupCount', min: 1, max: 3 },
+                                    { label: 'Backup Count', key: 'backupCount', min: 1, max: backupLimit },
                                     { label: 'Initial Backup (seconds)', key: 'initialBackupSeconds', min: 300, max: 86400 },
                                     { label: 'Backup Interval (seconds)', key: 'backupIntervalSeconds', min: 14400, max: 86400 }
                                 ].map((setting) => (

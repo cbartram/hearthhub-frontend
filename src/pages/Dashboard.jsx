@@ -51,10 +51,9 @@ const Dashboard = () => {
     const kubeApi = new KubeApiClient(user);
     const { width } = useWindowSize();
     const [resourceMetrics, setResourceMetrics] = useState([])
-    // TODO Set cpu and mem limit on the user's account rather than from the server
-    // this will let us add plans which increase cpu/mem limit for servers
     const [cpuLimit, setCpuLimit] = useState(user.subscriptionLimits.cpuLimit)
     const [memLimit, setMemLimit] = useState(user.subscriptionLimits.memoryLimit)
+    const [backupLimit, setBackupLimit] = useState(user.subscriptionLimits.maxBackups)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeView, setActiveView] = useState('servers');
     const [serversLoading, setServersLoading] = useState(true)
@@ -702,6 +701,7 @@ const Dashboard = () => {
                 return <CreateServer
                     cpuLimit={cpuLimit}
                     memoryLimit={memLimit}
+                    backupLimit={backupLimit}
                     onServerCreate={(s) => handleCreateServer(s)}
                     existingWorlds={primaryBackups}
                 />
