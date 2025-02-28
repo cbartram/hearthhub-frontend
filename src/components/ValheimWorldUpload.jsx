@@ -8,7 +8,7 @@ import {KubeApiClient} from "@/lib/api.js";
 import {useAuth} from "@/context/AuthContext.jsx";
 
 const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB in bytes
-const ValheimWorldUpload = ({ onUploadComplete }) => {
+const ValheimWorldUpload = ({ onUploadComplete, disabled }) => {
     const {user} = useAuth()
     const [seedFile, setSeedFile] = useState(null);
     const [worldFile, setWorldFile] = useState(null);
@@ -95,9 +95,14 @@ const ValheimWorldUpload = ({ onUploadComplete }) => {
     };
 
     const handleUpload = async () => {
+        if (disabled) {
+            setError("World uploads are disabled for your current plan.")
+            return
+        }
+
         if (!seedFile || !worldFile) {
             setError('Please select both seed and world files');
-            return;
+            return
         }
 
         const sizeError = validateFileSize(seedFile) || validateFileSize(worldFile);
@@ -106,7 +111,7 @@ const ValheimWorldUpload = ({ onUploadComplete }) => {
 
         if (sizeError || nameError || matchError) {
             setError(sizeError || nameError || matchError);
-            return;
+            return
         }
 
         setUploading(true);
@@ -222,7 +227,7 @@ const ValheimWorldUpload = ({ onUploadComplete }) => {
 
                 <Button
                     onClick={handleUpload}
-                    disabled={!seedFile || !worldFile || uploading}
+                    disabled={!seedFile || !worldFile || uploading || disabled}
                     className="w-full"
                 >
                     <Upload className="mr-2 h-4 w-4" />

@@ -69,6 +69,10 @@ const Navbar = ({ onLogout, userId, avatarId, skeleton, onBillingSession }) => {
                                     Billing
                                     <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                                 </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    Support
+                                    <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                                </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={onLogout}>

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import {Slider} from "@/components/ui/slider";
 
-const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit, backupLimit }) => {
+const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit, backupLimit, worldLimit }) => {
     const [cpu, setCpu] = React.useState([1]);
     const [memory, setMemory] = React.useState([1]);
 
@@ -55,6 +55,47 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
     const [errorData, setErrorData] = useState({})
     const [worldSelect, setWorldSelect] = useState('new')
     const [viewPass, setViewPass] = useState(false)
+    const modifierData = [
+        {
+            name: 'combat',
+            nameFormatted: "Combat",
+            values: ["veryeasy", "easy", "standard", "hard", "veryhard"],
+            valuesFormatted: ["Very Easy", "Easy", "Standard", "Hard", "Very Hard"]
+        },
+        {
+            name: 'deathpenalty',
+            nameFormatted: "Death Penalty",
+            values: ["casual", "veryeasy", "easy", "standard", "hard", "hardcore"],
+            valuesFormatted: ["Casual", "Very Easy", "Easy", "Standard", "Hard", "Hard Core"]
+        },
+        {
+            name: 'resources',
+            nameFormatted: "Resources",
+            values: ["muchless", "less", "standard", "more", "muchmore", "most"],
+            valuesFormatted: ["Much Less 0.25x", "Less 0.5x", "Standard 1x", "More 2x", "Much More 2.5x", "Most 3x"]
+        },
+        {
+            name: 'raids',
+            nameFormatted: "Raids",
+            values: ["none", "muchless", "less", "standard", "more", "muchmore"],
+            valuesFormatted: ["None", "Much Less", "Less", "Standard", "More", "Much More"]
+        },
+        {
+            name: 'portals',
+            nameFormatted: "Portals",
+            values: ["casual", "standard", "hard", "veryhard"],
+            valuesFormatted: ["Casual", "Standard", "Hard", "Very Hard"]
+        }
+    ]
+
+    useEffect(() => {
+        if(existingWorlds.length + 1 >= worldLimit) {
+            setErrorData({
+                ...errorData,
+                "world_limit": `Your plan allows for a maximum of ${worldLimit} worlds. Please remove a world or select an existing world for your server.`
+            })
+        }
+    }, []);
 
     useEffect(() => {
         if (formValues) {
@@ -292,18 +333,22 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
                             <CollapsibleContent className="p-4 space-y-4">
                                 {/* Optional Modifiers content with consistent spacing */}
                                 <div className="space-y-4">
-                                    {['combat', 'deathpenalty', 'resources', 'raids', 'portals'].map((field) => (
-                                        <div key={field} className="space-y-2">
-                                            <Label className="text-sm font-medium capitalize">{field.replace(/([A-Z])/g, ' $1').trim()}</Label>
+                                    {modifierData.map((field) => (
+                                        <div key={field.name} className="space-y-2">
+                                            <Label className="text-sm font-medium capitalize">{field.nameFormatted}</Label>
                                             <Select
-                                                value={formData[field]}
-                                                onValueChange={(value) => setFormData({...formData, [field]: value})}
+                                                value={formData[field.name]}
+                                                onValueChange={(value) => setFormData({...formData, [field.name]: value})}
                                             >
                                                 <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder={`Select ${field.replace(/([A-Z])/g, ' $1').trim()}`} />
+                                                    <SelectValue placeholder={`Select ${field.nameFormatted}`} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {/* Maintain your existing SelectItem options */}
+                                                    {
+                                                        field.values.map((v, i) => (
+                                                            <SelectItem value={v}>{field.valuesFormatted[i]}</SelectItem>
+                                                        ))
+                                                    }
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -342,7 +387,7 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
                             </CollapsibleContent>
                         </Collapsible>
 
-                        <Button type="submit" className="w-full">
+                        <Button type="submit" className="w-full" disabled={Object.keys(errorData).length > 0}>
                             {formValues ? 'Save Server' : 'Create Server'}
                         </Button>
                     </form>

@@ -27,7 +27,7 @@ class ApiClient {
             if (!response.ok) {
                 console.error("error during http fetch")
                 const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.message || `HTTP error status: ${response.status}`);
+                throw new Error(`error: ${errorData?.error}, status code: ${response.status}, message: ${errorData?.message}`);
             }
 
             const contentType = response.headers.get("content-type");
@@ -136,7 +136,7 @@ class KubeApiClient extends ApiClient {
         });
     }
 
-    async installFile(fileConfig) {
+    async fileOperation(fileConfig) {
         return this.request('/api/v1/file/install', {
             method: 'POST',
             body: JSON.stringify(fileConfig)

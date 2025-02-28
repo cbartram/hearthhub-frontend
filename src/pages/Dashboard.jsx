@@ -51,9 +51,6 @@ const Dashboard = () => {
     const kubeApi = new KubeApiClient(user);
     const { width } = useWindowSize();
     const [resourceMetrics, setResourceMetrics] = useState([])
-    const [cpuLimit, setCpuLimit] = useState(user.subscriptionLimits.cpuLimit)
-    const [memLimit, setMemLimit] = useState(user.subscriptionLimits.memoryLimit)
-    const [backupLimit, setBackupLimit] = useState(user.subscriptionLimits.maxBackups)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeView, setActiveView] = useState('servers');
     const [serversLoading, setServersLoading] = useState(true)
@@ -510,7 +507,7 @@ const Dashboard = () => {
                 return r
             })
         ])
-        kubeApi.installFile({
+        kubeApi.fileOperation({
             archive: false,
             prefix: backup.key,
             destination: `/root/.config/unity3d/IronGate/Valheim/worlds_local/${server.world_details.world}.db`,
@@ -538,7 +535,7 @@ const Dashboard = () => {
 
         // Prefix in S3 will differ between default mods and user uploaded mods
         const prefix = mod.default ? `mods/general/${mod.name}.zip` : `mods/${user.discordId}/${mod.name}.zip`
-        kubeApi.installFile({
+        kubeApi.fileOperation({
             prefix,
             destination: "/valheim/BepInEx/plugins",
             is_archive: true,
@@ -620,16 +617,23 @@ const Dashboard = () => {
                     ...primaryBackups.map(b => b.key === backup.key ? { ...b, installing: true }:b)
                 ])
                 break
+            case 'delete':
+                setPrimaryBackups(primaryBackups.filter(f => f.key !== backup.key))
             default:
                 console.error("unknown backup action: ", action)
         }
 
-        const op = !backup.installed ? "write" : "delete"
-        kubeApi.installFile({
+        let op = "write"
+        if (action === 'delete' || action === 'uninstall' || backup.installed) {
+            op = "delete"
+        }
+
+        kubeApi.fileOperation({
             prefix: backup.key,
             destination: "/root/.config/unity3d/IronGate/Valheim/worlds_local",
             is_archive: false,
-            operation: op
+            operation: op,
+            s3Delete: op === "delete" // Don't delete the files from s3 for simple uninstalls
         }).then(res => {
             console.log('install backup response: ', res)
         }).catch(err => {
@@ -651,7 +655,7 @@ const Dashboard = () => {
         ])
 
         try {
-           await kubeApi.installFile({
+           await kubeApi.fileOperation({
                 archive: false,
                 prefix: file.key,
                 destination: `/valheim/BepInEx/config`,
@@ -682,8 +686,10 @@ const Dashboard = () => {
         switch (activeView) {
             case "edit-server":
                 return <CreateServer
-                    cpuLimit={cpuLimit}
-                    memoryLimit={memLimit}
+                    cpuLimit={user.subscriptionLimits.cpuLimit}
+                    memoryLimit={user.subscriptionLimits.memoryLimit}
+                    backupLimit={user.subscriptionLimits.maxBackups}
+                    worldLimit={user.subscriptionLimits.maxWorlds}
                     onServerCreate={(data) => handleEditServer(data)}
                     existingWorlds={primaryBackups}
                     formValues={{
@@ -699,9 +705,10 @@ const Dashboard = () => {
                 />
             case "create-server":
                 return <CreateServer
-                    cpuLimit={cpuLimit}
-                    memoryLimit={memLimit}
-                    backupLimit={backupLimit}
+                    cpuLimit={user.subscriptionLimits.cpuLimit}
+                    memoryLimit={user.subscriptionLimits.memoryLimit}
+                    backupLimit={user.subscriptionLimits.maxBackups}
+                    worldLimit={user.subscriptionLimits.maxWorlds}
                     onServerCreate={(s) => handleCreateServer(s)}
                     existingWorlds={primaryBackups}
                 />
@@ -715,6 +722,7 @@ const Dashboard = () => {
                 />
             case "backups":
                 return <BackupsList
+                    worldUploadAllowed={user.subscriptionLimits.existingWorldUpload}
                     primaryBackups={primaryBackups}
                     replicaBackups={replicaBackups}
                     servers={servers}

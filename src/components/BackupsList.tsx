@@ -66,6 +66,7 @@ type BackupListProps = {
     onBackupRestore: Function
     onUploadComplete: Function
     servers: Server[]
+    worldUploadAllowed: boolean
 };
 
 const formatFileSize = (sizeInBytes: number): string => {
@@ -79,7 +80,7 @@ const extractTimestamp = (key: string): string | null => {
     return match ? formatTimestamp(match[1]) : null;
 };
 
-const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, servers, onBackupAction, onBackupRestore, onUploadComplete}) => {
+const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, servers, onBackupAction, onBackupRestore, onUploadComplete, worldUploadAllowed}) => {
     const [activeTab, setActiveTab] = useState<'primary' | 'replica'>('primary');
 
     const getRestoreButton = (backup: Backup) => {
@@ -204,6 +205,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                                         <TableHead>Server State</TableHead>
                                         <TableHead className="text-right">Size</TableHead>
                                         <TableHead className="text-right">Install World</TableHead>
+                                        <TableHead className="text-right">Delete World</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -214,11 +216,17 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                                                 {renderBadge(backup)}
                                             </TableCell>
                                             <TableCell>{renderCurrentWorld(backup)}</TableCell>
-                                            <TableCell className="text-right sm:text-left">
+                                            <TableCell align="right">
                                                 {formatFileSize(backup.fileSize)}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 {renderButtons(backup, onBackupAction)}
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('delete', backup)}>
+                                                    <Trash />
+                                                    Delete World
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -258,7 +266,10 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                     )}
                 </CardContent>
             </Card>
-            <ValheimWorldUpload onUploadComplete={onUploadComplete} />
+            {
+                worldUploadAllowed &&
+                <ValheimWorldUpload onUploadComplete={onUploadComplete} disabled={!worldUploadAllowed} />
+            }
         </div>
     )
 };
