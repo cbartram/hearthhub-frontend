@@ -95,6 +95,12 @@ class KubeApiClient extends ApiClient {
         })
     }
 
+    async getSubscriptionDetails(subscriptionId) {
+        return this.request(`/api/v1/stripe/subscription?id=${subscriptionId}`, {
+            method: 'GET'
+        })
+    }
+
     async listFiles() {
         return this.request("/api/v1/file", {
             method: 'GET'

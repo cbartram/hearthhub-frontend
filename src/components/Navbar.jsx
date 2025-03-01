@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import {ChevronDown, LogOut} from 'lucide-react';
+import {ChevronDown} from 'lucide-react';
 import {Skeleton} from "@/components/ui/skeleton";
 import {
     DropdownMenu,
@@ -8,14 +7,11 @@ import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
     DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {Navigate} from "react-router-dom";
 
 
 const Navbar = ({ onLogout, userId, avatarId, skeleton, onBillingSession }) => {
@@ -61,7 +57,11 @@ const Navbar = ({ onLogout, userId, avatarId, skeleton, onBillingSession }) => {
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => window.location.href = "/dashboard"}>
+                                    Dashboard
+                                    <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => window.location.href = "/profile"}>
                                     Profile
                                     <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                                 </DropdownMenuItem>

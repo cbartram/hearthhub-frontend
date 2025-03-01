@@ -6,6 +6,7 @@ import AuthCallback from "@/components/AuthCallback";
 import Login from '@/pages/Login'
 import Dashboard from '@/pages/Dashboard'
 import Landing from "@/pages/Landing";
+import Profile from "@/pages/Profile";
 import Pricing from "@/pages/Pricing"
 
 import { RedirectIfAuthenticated } from '@/components/RedirectIfAuthenticated'
@@ -32,6 +33,12 @@ createRoot(document.getElementById('root')).render(
                     }
                 />
                 <Route path="/discord/oauth" element={<AuthCallback />} />
+                <Route path="/profile" element={
+                        <ProtectedRoute resource="profile">
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route
                     path="/dashboard"
                     element={
