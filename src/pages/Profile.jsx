@@ -7,14 +7,13 @@ import { Separator } from '@/components/ui/separator';
 import {useAuth} from "@/context/AuthContext.jsx";
 import {KubeApiClient} from "@/lib/api.js";
 import Navbar from "@/components/Navbar.jsx";
-import {Skeleton} from "@/components/ui/skeleton";
 import SkeletonLoading from "@/components/SkeletonLoading.jsx";
 
 const Profile = () => {
     const {user, logout} = useAuth()
     const kubeApi = new KubeApiClient(user);
     const [subscriptionDetails, setSubscriptionDetails] = useState({})
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const subscription = {
         status: 'active', // active, canceled, past_due, incomplete, etc.
@@ -23,15 +22,6 @@ const Profile = () => {
         currentPeriodEnd: '2025-03-31T23:59:59Z',
         nextBillingDate: '2025-03-31T23:59:59Z',
         cancelAtPeriodEnd: false,
-    };
-
-    const calculateDaysUntilDue = (periodEnd) => {
-        const now = new Date();
-        const dueDate = new Date(periodEnd);
-        const diffTime = dueDate - now;
-        console.log(diffTime)
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays > 0 ? diffDays : 0;
     };
 
     const formatDate = (dateString) => {
