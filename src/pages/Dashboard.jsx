@@ -785,7 +785,7 @@ const Dashboard = () => {
             </div>
 
             <main className="flex-1 w-full min-w-0 lg:ml-0">  {/* Added w-full */}
-                <div className="pl-16 lg:pl-0">
+                <div className="pl-16 lg:pl-0 bg-slate-700">
                     <Navbar
                         onLogout={logout}
                         onBillingSession={() => createBillingSession(user.customerId)}
