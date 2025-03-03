@@ -83,7 +83,7 @@ const Dashboard = () => {
                     kubeApi.getServers()
                         .then(s => {
                             setServers([
-                                ...s.servers.map(serv => ({
+                                ...s.map(serv => ({
                                     ...serv,
                                     // Insert temp join code while we wait for the actual to come through ws
                                     joinCode: ""

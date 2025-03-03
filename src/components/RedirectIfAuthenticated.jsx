@@ -11,12 +11,17 @@ export const RedirectIfAuthenticated = ({ children, resource }) => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                await getUser(resource);
-            } catch (error) {
-                console.error("Authentication check failed:", error);
-            } finally {
-                setIsLoading(false);
+            if (!user) {
+                try {
+                    await getUser(resource);
+                } catch (error) {
+                    console.error("Authentication check failed:", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                console.log('user already fetched')
+                setIsLoading(false)
             }
         };
 
@@ -40,7 +45,6 @@ export const RedirectIfAuthenticated = ({ children, resource }) => {
     }
 
     if (user && user.subscriptionStatus !== "active") {
-        console.log(`user exists with sub status: ${user.subscriptionStatus} redirecting to /pricing`)
         return <Navigate to="/pricing" replace />;
     }
 

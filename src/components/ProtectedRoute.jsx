@@ -52,7 +52,7 @@ export const ProtectedRoute = ({ children, resource }) => {
                 setAuthError(true);
                 setIsLoading(false);
             }
-        };
+        }
 
         checkAuth();
     }, [paymentState.processingComplete]);
@@ -96,6 +96,7 @@ export const ProtectedRoute = ({ children, resource }) => {
                         processingComplete: true
                     }));
                     clearInterval(timer);
+                    window.location.href = '/dashboard'
                 }
             }, interval);
 
@@ -140,7 +141,7 @@ const renderLoadingState = (paymentState) => {
                         <h2 className="text-xl font-semibold mb-4">Processing your purchase...</h2>
                         <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5 mb-6">
                             <div
-                                className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                                className="bg-orange-600 h-2.5 rounded-full transition-all duration-300 ease-out"
                                 style={{ width: `${paymentState.progress}%` }}
                             ></div>
                         </div>
