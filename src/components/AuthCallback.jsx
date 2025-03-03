@@ -1,17 +1,68 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import Logo from "@/assets/hearthhub_logo.png";
-import {K8S_BASE_URL} from "@/lib/constants.ts";
-import {useAuth} from "@/context/AuthContext.jsx"
+import {K8S_BASE_URL} from "@/lib/constants";
+import {useAuth} from "@/context/AuthContext"
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import {Button} from "@/components/ui/button";
+
+
+const SpinnerRing = () => {
+    return (
+        <div className="absolute inset-0 w-full h-full">
+            <svg className="absolute inset-0" viewBox="0 0 100 100">
+                <circle
+                    cx="50"
+                    cy="50"
+                    fill="none"
+                    stroke="#e0e0e0"
+                    strokeWidth="4"
+                    r="38"
+                    strokeDasharray="180 180"
+                />
+                <circle
+                    cx="50"
+                    cy="50"
+                    fill="none"
+                    stroke="#F18121"
+                    strokeWidth="4"
+                    r="38"
+                    strokeDasharray="180 180"
+                    strokeDashoffset="60"
+                    className="animate-spin-slow origin-center"
+                    style={{
+                        transformOrigin: "center",
+                        animation: "spin 1.5s linear infinite"
+                    }}
+                />
+            </svg>
+        </div>
+    );
+};
 
 const AuthCallback = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
+    const [error, setError] = useState(null);
+    const location = useLocation();
+
 
     useEffect(() => {
         const handleCallback = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
+
+            const errorParam = urlParams.get('error');
+            const errorDescription = urlParams.get('error_description');
+
+            if (errorParam) {
+                setError({
+                    type: errorParam,
+                    description: errorDescription ? errorDescription.replace(/\+/g, ' ') : 'Authentication failed'
+                });
+                return
+            }
 
             if (code) {
                 try {
@@ -48,13 +99,34 @@ const AuthCallback = () => {
     }, [navigate]);
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="mb-8">
-                <div className="w-48 h-48 rounded-2xl flex items-center justify-center">
-                    <img src={Logo} alt="Hearthhub Logo"/>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-slate-50 to-white p-4">
+            {
+                error &&
+                <div className="w-full max-w-md">
+                    <Alert variant="destructive" className="mb-6 border-red-600">
+                        <AlertCircle className="h-5 w-5" />
+                        <AlertTitle className="font-semibold">Authentication Error: {error.type}</AlertTitle>
+                        <AlertDescription className="mt-2">
+                            {error.description}
+                        </AlertDescription>
+                        <div className="mt-4">
+                            <Button
+                                onClick={() => window.location.href = '/login'}
+                            >
+                                Return to login
+                            </Button>
+                        </div>
+                    </Alert>
+                </div>
+            }
+            <div className="mb-12 md:mb-16 relative">
+                <div className="relative w-32 h-32 md:w-48 md:h-48 rounded-2xl flex items-center justify-center bg-white shadow-lg">
+                    <img src={Logo} alt="Hearthhub Logo" className="w-24 h-24 md:w-36 md:h-36 object-contain" />
+                    <SpinnerRing />
                 </div>
             </div>
-            <h3 className="text-lg">Completing authentication...</h3>
+            <h3 className="text-lg md:text-xl font-semibold text-slate-800">Completing authentication...</h3>
+            <p className="mt-2 text-slate-500 text-sm md:text-base">Please wait while we set up your account</p>
         </div>
     );
 };
