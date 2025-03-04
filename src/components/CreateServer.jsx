@@ -26,8 +26,10 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import {Slider} from "@/components/ui/slider";
+import {useAuth} from "@/context/AuthContext.jsx";
 
 const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit, backupLimit, worldLimit }) => {
+    const {user} = useAuth()
     const [cpu, setCpu] = React.useState([1]);
     const [memory, setMemory] = React.useState([1]);
 
@@ -95,7 +97,19 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
                 "world_limit": `Your plan allows for a maximum of ${worldLimit} worlds. Please remove a world or select an existing world for your server.`
             })
         }
-    }, []);
+
+        if("server_limit" in errorData && worldSelect === "existing") {
+            setErrorData({})
+            return
+        }
+
+        if(user.servers.length >= 1 && worldSelect === "new") {
+            setErrorData({
+                ...errorData,
+                "server_limit": `You already have a server created. Either delete the server or select "Existing World".`
+            })
+        }
+    }, [worldSelect]);
 
     useEffect(() => {
         if (formValues) {

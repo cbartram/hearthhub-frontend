@@ -192,9 +192,10 @@ const Dashboard = () => {
                             setPrimaryBackups(backups.map(b => {
                                 for (const world of user.world_files) {
                                     let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
-                                    if (world.name === shortName) {
+                                    if (world.file_name === shortName) {
                                         return {
                                             ...b,
+                                            size: world.size,
                                             installing: false,
                                             installed: world.installed
                                         }
