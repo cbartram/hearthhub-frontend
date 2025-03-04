@@ -89,7 +89,7 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
     ]
 
     useEffect(() => {
-        if(existingWorlds.length + 1 >= worldLimit) {
+        if(existingWorlds.length + 1 > worldLimit) {
             setErrorData({
                 ...errorData,
                 "world_limit": `Your plan allows for a maximum of ${worldLimit} worlds. Please remove a world or select an existing world for your server.`

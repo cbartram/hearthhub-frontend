@@ -86,8 +86,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
     const getRestoreButton = (backup: Backup) => {
         if(backup.installing) {
             return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300" disabled>
-                Installing...
-                <LoaderCircle className="ml-2 animate-spin" />
+                Installing... <LoaderCircle className="ml-2 animate-spin" />
             </Button>
         }
 

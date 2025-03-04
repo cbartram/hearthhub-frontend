@@ -242,7 +242,7 @@ const ServerDetailsCard = ({ serverData, onAction, onEdit }) => {
                                     <Pause className="mr-2" /> Stop
                                 </Button>
                                 <Button
-                                    disabled={state !== "terminated" && state !== "stopped"}
+                                    disabled={state !== "running"}
                                     className="bg-red-200 text-red-800 hover:bg-red-300 py-6 hover:border-1 hover:border-red-200 w-full sm:w-auto"
                                     onClick={() => setShowDialog(true)}
                                 >

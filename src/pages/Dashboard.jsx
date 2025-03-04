@@ -108,15 +108,15 @@ const Dashboard = () => {
                             setConfigs([
                                 ...res.configs.map(config => {
                                     const name = config.key.split("/")[config.key.split("/").length - 1]
-                                    for(const installedConfigFile in user.installedConfig) {
-                                        if(name === installedConfigFile) {
+                                    for(const config of user.config_files) {
+                                        if(name === config.file_name) {
                                             return {
                                                 name,
                                                 content: '',
-                                                key: config.key,
-                                                size: config.fileSize,
+                                                key: config.s3_key,
+                                                size: config.size,
                                                 updated: false,
-                                                installed: true,
+                                                installed: config.installed,
                                                 installing: false,
                                             }
                                         }
@@ -152,9 +152,9 @@ const Dashboard = () => {
 
                                     // Incorporate cognito data from when a user installed a mod (previously) so that
                                     // we can mark the mod as installed already.
-                                    for (const key in user.installedMods) {
-                                        if (key.slice(0, -4) === filename) {
-                                            remappedMod.installed = user.installedMods[key]
+                                    for (const file of user.mod_files) {
+                                        if (file.file_name.slice(0, -4) === filename) {
+                                            remappedMod.installed = file.installed
                                         }
                                     }
 
@@ -173,6 +173,7 @@ const Dashboard = () => {
                             for(const file of res.backups) {
                                 let ext = file.key.slice(file.key.lastIndexOf(".") + 1, file.key.length)
                                 let base = file.key.slice(0, file.key.lastIndexOf("."))
+
                                 if(file.key.includes("_backup_auto-") && ext === "db") {
                                     if(backupKeys.hasOwnProperty(`${base}.fwl`)) {
                                         replicas.push(file)
@@ -189,13 +190,13 @@ const Dashboard = () => {
                             // files and cognito then take the install status of cognito. If no match is found
                             // the backup has never been installed on the pvc.
                             setPrimaryBackups(backups.map(b => {
-                                for (const key in user.installedBackups) {
+                                for (const world of user.world_files) {
                                     let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
-                                    if (key === shortName) {
+                                    if (world.name === shortName) {
                                         return {
                                             ...b,
                                             installing: false,
-                                            installed: user.installedBackups[key]
+                                            installed: world.installed
                                         }
                                     }
                                 }
@@ -208,13 +209,13 @@ const Dashboard = () => {
                             }))
 
                             setReplicaBackups(replicas.map(b => {
-                                for (const key in user.installedBackups) {
+                                for (const backup of user.backup_files) {
                                     let shortName = b.key.slice(b.key.lastIndexOf("/") + 1, b.key.length)
-                                    if (key === shortName) {
+                                    if (backup.name === shortName) {
                                         return {
                                             ...b,
                                             installing: false,
-                                            installed: user.installedBackups[key]
+                                            installed: backup.installed
                                         }
                                     }
                                 }
