@@ -28,8 +28,7 @@ import {
 import {Slider} from "@/components/ui/slider";
 import {useAuth} from "@/context/AuthContext.jsx";
 
-const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit, backupLimit, worldLimit }) => {
-    const {user} = useAuth()
+const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, memoryLimit, backupLimit, worldLimit, existingServers }) => {
     const [cpu, setCpu] = React.useState([1]);
     const [memory, setMemory] = React.useState([1]);
 
@@ -103,7 +102,7 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
             return
         }
 
-        if(user.servers.length >= 1 && worldSelect === "new") {
+        if(existingServers.length >= 1 && worldSelect === "new") {
             setErrorData({
                 ...errorData,
                 "server_limit": `You already have a server created. Either delete the server or select "Existing World".`
@@ -131,6 +130,15 @@ const CreateServer = ({ onServerCreate, existingWorlds, formValues, cpuLimit, me
 
         formData.world = formData.world.replaceAll(" ", "-")
         formData.name = formData.name.replaceAll(" ", "-")
+
+        console.log(formData.world, formData.name)
+        if(formData.world.includes("_backup_auto")) {
+            err['world'] = 'Your world name cannot include \"_backup_auto\"'
+        }
+
+        if(formData.name.includes("_backup_auto")) {
+            err['name'] = 'Your server name cannot include \"_backup_auto\"'
+        }
 
         if(Object.keys(err).length > 0) {
             setErrorData({...errorData, ...err})

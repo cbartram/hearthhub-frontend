@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {DatabaseBackup, Download, Globe2, Info, LoaderCircle, Trash} from 'lucide-react';
@@ -21,6 +21,7 @@ import {
 import DangerDialogue from '@/components/DangerDialogue.jsx'
 // @ts-ignore
 import ValheimWorldUpload from '@/components/ValheimWorldUpload.jsx'
+import {formatTimestamp, formatBytes} from "@/lib/utils.ts";
 
 type Backup = {
     key: string
@@ -69,12 +70,6 @@ type BackupListProps = {
     worldUploadAllowed: boolean
 };
 
-const formatFileSize = (sizeInBytes: number): string => {
-    if (sizeInBytes < 1024) return `${sizeInBytes} B`;
-    const sizeInKB = (sizeInBytes / 1024).toFixed(1);
-    return `${sizeInKB} KB`;
-};
-
 const extractTimestamp = (key: string): string | null => {
     const match = key.match(/_backup_auto-(\d{14})\./);
     return match ? formatTimestamp(match[1]) : null;
@@ -82,6 +77,57 @@ const extractTimestamp = (key: string): string | null => {
 
 const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, servers, onBackupAction, onBackupRestore, onUploadComplete, worldUploadAllowed}) => {
     const [activeTab, setActiveTab] = useState<'primary' | 'replica'>('primary');
+
+    const renderBadge = (backup: Backup) => {
+        // @ts-ignore
+        let backupName = backup.key.split("/").pop().slice(0, backup.key.split("/").pop().length - 3)
+        const filteredServer = servers.filter(s => s.world_details.world === backupName)
+        if(backup.installed || filteredServer.length >= 0) {
+            return <Badge className="bg-green-200 text-green-800 hover:bg-green-300 ml-2">Installed</Badge>
+        }
+
+        return <Badge className="bg-red-200 text-red-800 hover:bg-red-300 ml-2">Not Installed</Badge>
+    }
+
+
+    const renderButtons = (backup: Backup, onBackupAction: Function) => {
+        // @ts-ignore
+        let backupName = backup.key.split("/").pop().slice(0, backup.key.split("/").pop().length - 3)
+        const filteredServer = servers.filter(s => s.world_details.world === backupName)
+
+        if(filteredServer.length > 0) {
+            const server = filteredServer[0]
+            if (server.state === "running") {
+                return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
+                    Installed
+                    </Button>
+            }
+        }
+
+        if(backup.installing && !backup.installed) {
+            return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
+                Installing...
+                <LoaderCircle className="ml-2 animate-spin" />
+            </Button>
+        } else if(backup.installing && backup.installed) {
+            return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
+                Uninstalling...
+                <LoaderCircle className="ml-2 animate-spin" />
+            </Button>
+        }
+
+        if(!backup.installing && !backup.installed) {
+            return <Button className="bg-green-200 text-green-800 hover:bg-green-300 hover:border-green-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('install', backup)}>
+                <Download />
+                Install
+            </Button>
+        }
+
+        return <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('uninstall', backup)}>
+            <Trash />
+            Uninstall
+        </Button>
+    }
 
     const getRestoreButton = (backup: Backup) => {
         if(backup.installing) {
@@ -126,6 +172,17 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
             </HoverCardContent>
         </HoverCard>
         )
+    }
+
+    const checkDeleteDisabled = (backup: Backup) => {
+        // @ts-ignore
+        let backupName = backup.key.split("/").pop().slice(0, backup.key.split("/").pop().length - 3)
+        const filteredServer = servers.filter(s => s.world_details.world === backupName)
+        if(filteredServer.length > 0) {
+            return filteredServer[0].state === "running"
+        }
+
+        return false
     }
 
     const renderCurrentWorld = (backup: Backup) => {
@@ -216,13 +273,13 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                                             </TableCell>
                                             <TableCell>{renderCurrentWorld(backup)}</TableCell>
                                             <TableCell align="right">
-                                                {formatFileSize(backup.fileSize)}
+                                                {formatBytes(backup.fileSize)}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 {renderButtons(backup, onBackupAction)}
                                             </TableCell>
                                             <TableCell align="right">
-                                                <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('delete', backup)}>
+                                                <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('delete', backup)} disabled={checkDeleteDisabled(backup)}>
                                                     <Trash />
                                                     Delete World
                                                 </Button>
@@ -255,7 +312,7 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
                                             <TableCell>{getRestoreButton(backup)}</TableCell>
                                             <TableCell>{extractTimestamp(backup.key) || 'Unknown'}</TableCell>
                                             <TableCell className="text-right sm:text-left">
-                                                {formatFileSize(backup.fileSize)}
+                                                {formatBytes(backup.fileSize)}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -272,50 +329,5 @@ const BackupList: React.FC<BackupListProps> = ({primaryBackups, replicaBackups, 
         </div>
     )
 };
-
-const formatTimestamp = (timestamp: string): string => {
-    const year = timestamp.slice(0, 4);
-    const month = timestamp.slice(4, 6);
-    const day = timestamp.slice(6, 8);
-    const hours = timestamp.slice(8, 10);
-    const minutes = timestamp.slice(10, 12);
-
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-};
-
-const renderBadge = (backup: Backup) => {
-    if(backup.installed) {
-        return <Badge className="bg-green-200 text-green-800 hover:bg-green-300 ml-2">Installed</Badge>
-    }
-
-    return <Badge className="bg-red-200 text-red-800 hover:bg-red-300 ml-2">Not Installed</Badge>
-}
-
-
-const renderButtons = (backup: Backup, onBackupAction: Function) => {
-    if(backup.installing && !backup.installed) {
-        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
-            Installing...
-            <LoaderCircle className="ml-2 animate-spin" />
-        </Button>
-    } else if(backup.installing && backup.installed) {
-        return <Button className="bg-blue-200 text-blue-800 hover:bg-blue-300 hover:border-1 hover:border-blue-200" disabled>
-            Uninstalling...
-            <LoaderCircle className="ml-2 animate-spin" />
-        </Button>
-    }
-
-    if(!backup.installing && !backup.installed) {
-        return <Button className="bg-green-200 text-green-800 hover:bg-green-300 hover:border-green-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('install', backup)}>
-            <Download />
-            Install
-        </Button>
-    }
-
-    return <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:border-red-200 hover:border-1 hover:outline-none" onClick={() => onBackupAction('uninstall', backup)}>
-        <Trash />
-        Uninstall
-    </Button>
-}
 
 export default BackupList

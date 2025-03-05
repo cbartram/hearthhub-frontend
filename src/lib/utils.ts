@@ -14,22 +14,28 @@ interface CreateUserRequest {
 }
 
 export function formatBytes(bytes: number): string {
+  const KB = 1024
   const MB = 1024 * 1024; // 1 MB = 1024 * 1024 bytes
   const GB = 1024 * MB;   // 1 GB = 1024 MB
   const TB = 1024 * GB;   // 1 TB = 1024 GB
+
+  if(bytes < 1024) {
+    return `${bytes} B`
+  }
+
+  if (bytes >= 1024 && bytes <= KB) {
+    return `${bytes / 1024} KB`
+  }
 
   if(`${(bytes / MB).toFixed(2)} MB` == "0.00 MB") {
     return "0.01 MB"
   }
 
   if (bytes < GB) {
-    // Convert to MB if size is less than 1 GB
     return `${(bytes / MB).toFixed(2)} MB`;
   } else if (bytes < TB) {
-    // Convert to GB if size is less than 1 TB
     return `${(bytes / GB).toFixed(2)} GB`;
   } else {
-    // Convert to TB otherwise
     return `${(bytes / TB).toFixed(2)} TB`;
   }
 }
@@ -41,6 +47,16 @@ export const discordRedirect = () => {
     window.location.href = "https://discord.com/oauth2/authorize?client_id=1330916460343857184&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fdiscord%2Foauth&scope=email+identify"
   }
 }
+
+export const formatTimestamp = (timestamp: string): string => {
+  const year = timestamp.slice(0, 4);
+  const month = timestamp.slice(4, 6);
+  const day = timestamp.slice(6, 8);
+  const hours = timestamp.slice(8, 10);
+  const minutes = timestamp.slice(10, 12);
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
 
 /**
  * Creates a new user in Cognito. If the user already exists it will be returned instead.

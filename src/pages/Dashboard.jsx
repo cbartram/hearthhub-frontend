@@ -713,6 +713,7 @@ const Dashboard = () => {
                     worldLimit={user.subscriptionLimits.maxWorlds}
                     onServerCreate={(s) => handleCreateServer(s)}
                     existingWorlds={primaryBackups}
+                    existingServers={servers}
                 />
             case "servers":
                 return serverList
