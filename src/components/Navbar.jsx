@@ -36,7 +36,7 @@ const Navbar = ({ onLogout, userId, avatarId, skeleton, onBillingSession }) => {
     }
 
     return (
-        <div className="bg-slate-700 text-white p-4 bg-gradient-to-r from-slate-700 to-slate-800 opacity-95 drop-shadow-lg">
+        <div className="bg-slate-700 text-white p-2 bg-gradient-to-r from-slate-700 to-slate-800 opacity-95 drop-shadow-lg">
             <div className="max-w-4xl mx-auto flex items-center justify-between">
                 <div className="flex items-center space-x-6">
                     <nav className="flex space-x-4">

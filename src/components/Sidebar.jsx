@@ -60,9 +60,9 @@ const Sidebar = ({ activeView, onViewChange, skeleton }) => {
     }
 
     return (
-        <div className="w-64 bg-white h-screen flex flex-col shadow-sm">
-            <div className="p-6 mt-16 lg:mt-0">
-                <div className="flex items-center mb-8">
+        <div className="w-64 bg-white flex flex-col shadow-sm min-h-screen">
+            <div className="p-6 pt-16 lg:pt-0 sticky top-0">
+                <div className="flex items-center mb-8 mt-6">
                     <div className="w-10 h-10 flex items-center justify-center mr-3 bg-gradient-to-br from-orange-400 to-red-600 rounded-lg shadow-md">
                         <img src={HearthHubLogo} alt="HearthHub" className="w-8 h-8" />
                     </div>
@@ -90,7 +90,7 @@ const Sidebar = ({ activeView, onViewChange, skeleton }) => {
                 </div>
             </div>
 
-            <div className="mt-auto border-t border-gray-100 p-4">
+            <div className="mt-auto sticky bottom-0 border-t border-gray-100 p-4">
                 <span className="text-xs text-gray-400 flex justify-center">v0.0.1</span>
             </div>
         </div>

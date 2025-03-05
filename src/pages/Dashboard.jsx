@@ -770,7 +770,9 @@ const Dashboard = () => {
             </div>
 
             <div className={`
-                fixed lg:static 
+                fixed
+                bg-white
+                lg:static 
                 inset-y-0 left-0 
                 z-20 
                 transform lg:transform-none
@@ -788,7 +790,7 @@ const Dashboard = () => {
             </div>
 
             <main className="flex-1 w-full min-w-0 lg:ml-0">  {/* Added w-full */}
-                <div className="pl-16 lg:pl-0 bg-slate-700">
+                <div className="pl-16 lg:pl-0 bg-slate-700 sticky top-0">
                     <Navbar
                         onLogout={logout}
                         onBillingSession={() => createBillingSession(user.customerId)}
@@ -807,7 +809,7 @@ const Dashboard = () => {
                     </Alert>
                 )}
 
-                <div className="p-4 lg:p-6">
+                <div id="main-content">
                     {renderViews()}
                 </div>
             </main>
