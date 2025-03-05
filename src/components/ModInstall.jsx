@@ -84,6 +84,7 @@ const ModInstall = ({mods, handleModToggle, onUploadComplete }) => {
                                 </div>
                                 <Switch
                                     checked={m.installed}
+                                    disabled={m.installing}
                                     onCheckedChange={() => handleModToggle(m.id)}
                                 />
                             </div>
