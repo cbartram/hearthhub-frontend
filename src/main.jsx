@@ -1,12 +1,13 @@
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from '@/context/AuthContext';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import AuthCallback from "@/components/AuthCallback";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from '@/context/AuthContext'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
+import AuthCallback from "@/components/AuthCallback"
 import Login from '@/pages/Login'
 import Dashboard from '@/pages/Dashboard'
-import Landing from "@/pages/Landing";
-import Profile from "@/pages/Profile";
+import Landing from "@/pages/Landing"
+import Profile from "@/pages/Profile"
+import Support from "@/pages/Support"
 import Pricing from "@/pages/Pricing"
 
 import { RedirectIfAuthenticated } from '@/components/RedirectIfAuthenticated'
@@ -38,6 +39,12 @@ createRoot(document.getElementById('root')).render(
                             <Profile />
                         </ProtectedRoute>
                     }
+                />
+                <Route path="/support" element={
+                    <ProtectedRoute resource="support">
+                        <Support />
+                    </ProtectedRoute>
+                }
                 />
                 <Route
                     path="/dashboard"

@@ -68,7 +68,7 @@ const Navbar = ({ onLogout, userId, avatarId, skeleton, onBillingSession }) => {
                                     Billing
                                     <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => window.location.href = "/support"}>
                                     Support
                                     <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                                 </DropdownMenuItem>

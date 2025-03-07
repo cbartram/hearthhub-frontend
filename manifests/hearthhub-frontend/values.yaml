@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: cbartram/hearthhub-frontend
-  tag: "0.0.33"
+  tag: "0.0.35"
 
 service:
   type: ClusterIP

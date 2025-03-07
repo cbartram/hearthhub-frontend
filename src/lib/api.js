@@ -77,6 +77,16 @@ class KubeApiClient extends ApiClient {
         }
     }
 
+    async sendEmail(subject, message) {
+        return this.request('/api/v1/support/send-message', {
+            method: "POST",
+            body: JSON.stringify({
+                subject,
+                message,
+            })
+        })
+    }
+
     async createCheckoutSession(item) {
         return this.request(`/api/v1/stripe/create-checkout-session?key=${item.name}`, {
             method: 'GET'
